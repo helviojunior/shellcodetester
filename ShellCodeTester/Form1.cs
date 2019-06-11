@@ -10,6 +10,7 @@ using System.IO;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 
 namespace ShellCodeTester
 {
@@ -63,7 +64,8 @@ namespace ShellCodeTester
 
                 try
                 {
-                    shellcode.AddRange(StringToByteArray(txtShellcode.Text.Replace("\r", "").Replace("\n", "").Replace(" ", "").Replace("0x", "").Replace(",", "")));
+                    txtShellcode.Text = ExtractHexDigits(txtShellcode.Text);
+                    shellcode.AddRange(StringToByteArray(txtShellcode.Text));
                 }
                 catch (Exception ex)
                 {
@@ -116,6 +118,20 @@ namespace ShellCodeTester
             GetSystemInfo(out info);
 
             return info.AllocationGranularity;
+        }
+
+        public static string ExtractHexDigits(string input)
+        {
+            // remove any characters that are not digits (like #)
+            Regex isHexDigit
+               = new Regex("[abcdefABCDEF\\d]+", RegexOptions.Compiled);
+            string newnum = "";
+            foreach (char c in input)
+            {
+                if (isHexDigit.IsMatch(c.ToString()))
+                    newnum += c.ToString();
+            }
+            return newnum;
         }
 
 
