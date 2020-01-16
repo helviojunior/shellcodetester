@@ -2,6 +2,10 @@
 ##
 ## Based from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+# Mac Files
+.DS_Store/
+*.DS_Store
+
 # User-specific files
 *.suo
 *.user

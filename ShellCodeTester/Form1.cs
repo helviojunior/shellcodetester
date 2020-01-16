@@ -17,6 +17,7 @@ namespace ShellCodeTester
     public partial class Form1 : Form
     {
         private UInt32 pageSize = 0;
+        OpenFileDialog openFileDialog1 = new OpenFileDialog();
 
         public Form1()
         {
@@ -59,6 +60,17 @@ namespace ShellCodeTester
 
                 List<Byte> shellcode = new List<byte>();
 
+                if (cbAlighStack.Checked){
+                    byte[] getEIP = { 0xeb, 0x04, 0x8b, 0x04, 0x24, 0xc3, 0xe8, 0xf7, 0xff, 0xff, 0xff };
+                    byte[] movESPEAX = { 0x89, 0xc4 };
+                    shellcode.AddRange(getEIP);
+                    shellcode.Add(0x05); //ADD EAX
+                    shellcode.AddRange(BitConverter.GetBytes(txtShellcode.Text.Length)); //Size to be added
+                    shellcode.AddRange(movESPEAX);
+
+                }
+
+
                 if (cbBreakpoint.Checked)
                     shellcode.Add(0xCC);
 
@@ -67,7 +79,7 @@ namespace ShellCodeTester
                     txtShellcode.Text = ExtractHexDigits(txtShellcode.Text);
                     shellcode.AddRange(StringToByteArray(txtShellcode.Text));
                 }
-                catch (Exception ex)
+                catch
                 {
                     shellcode.Clear();
                 }
@@ -86,7 +98,7 @@ namespace ShellCodeTester
 
                 sbStatus.Text = "Executando shellcode, aguarde...";
 
-                Execute(shellcode.ToArray());
+                Execute(shellcode.ToArray(), cbBreakpoint.Checked);
             }
             finally
             {
@@ -95,7 +107,7 @@ namespace ShellCodeTester
             }
         }
 
-        private void Execute(Byte[] payload)
+        private void Execute(Byte[] payload, Boolean debug = false)
         {
             System.Reflection.Assembly asm = System.Reflection.Assembly.GetExecutingAssembly();
             String path = Path.GetDirectoryName(asm.Location);
@@ -104,8 +116,18 @@ namespace ShellCodeTester
             p.StartInfo.UseShellExecute = true;
             //p.StartInfo.RedirectStandardOutput = true;
             //p.StartInfo.RedirectStandardError = true;
-            p.StartInfo.FileName = Path.Combine(path, "Runner.exe");
+            if (rb64Bits.Checked)
+            {
+                p.StartInfo.FileName = Path.Combine(path, "Runner64.exe");
+            }
+            else
+            {
+                p.StartInfo.FileName = Path.Combine(path, "Runner.exe");
+            }
             p.StartInfo.Arguments = BitConverter.ToString(payload).Replace("-","");
+
+            if (debug)
+                p.StartInfo.Arguments += " --debug";
             p.Start();
 
             p.WaitForExit();
@@ -187,5 +209,32 @@ namespace ShellCodeTester
 
         [DllImport("kernel32.dll", SetLastError = false)]
         public static extern void GetSystemInfo(out SYSTEM_INFO Info);
+
+        private void AboutToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void OpenToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+           
+            this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
+            this.openFileDialog1.FileName = "";
+            DialogResult res = this.openFileDialog1.ShowDialog();
+            if (res == DialogResult.OK)
+            {
+                try
+                {
+                    byte[] fileBytes = File.ReadAllBytes(this.openFileDialog1.FileName);
+                    String sData = BitConverter.ToString(fileBytes).Replace("-","");
+                    txtShellcode.Text = sData;
+                }
+                catch(Exception ex)
+                {
+                    MessageBox.Show("Erro carregando o arquivo: " + ex.Message, "Erro!", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    return;
+                }
+            }
+        }
     }
 }

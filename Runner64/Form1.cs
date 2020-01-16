@@ -9,7 +9,6 @@ namespace Runner
     public partial class Form1 : Form
     {
         private String[] args;
-        private UInt32 pageSize = 0;
 
         public Form1(string[] args)
         {
@@ -40,7 +39,8 @@ namespace Runner
 
                 if (args.Length > 1)
                 {
-                    foreach(String a in args){
+                    foreach (String a in args)
+                    {
                         if (a.ToLower() == "--debug")
                             debug = true;
                     }
@@ -74,7 +74,7 @@ namespace Runner
                     debug = true;
 
                 if (debug)
-                    MessageBox.Show("Breakpoint ativado. Anexe o debugger 32 bits ao PID " + pid + " e pressione OK para continuar.", "Aguardando...", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show("Breakpoint ativado. Anexe o debugger 64 bits ao PID " + pid + " e pressione OK para continuar.", "Aguardando...", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
                 Run.Execute(shellcode.ToArray());
             }
