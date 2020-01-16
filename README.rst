@@ -6,10 +6,10 @@ This tools test generated ShellCodes.
 Usage
 =====
 
-.. image:: ./images/main.png
+.. image:: ./images/main64.png
 
 Exemple
 =======
 
 .. image:: ./images/msfvenon.png
-.. image:: ./images/running.png
+.. image:: ./images/running64.png
