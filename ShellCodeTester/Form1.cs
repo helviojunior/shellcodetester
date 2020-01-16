@@ -61,12 +61,32 @@ namespace ShellCodeTester
                 List<Byte> shellcode = new List<byte>();
 
                 if (cbAlighStack.Checked){
-                    byte[] getEIP = { 0xeb, 0x04, 0x8b, 0x04, 0x24, 0xc3, 0xe8, 0xf7, 0xff, 0xff, 0xff };
-                    byte[] movESPEAX = { 0x89, 0xc4 };
-                    shellcode.AddRange(getEIP);
-                    shellcode.Add(0x05); //ADD EAX
-                    shellcode.AddRange(BitConverter.GetBytes(txtShellcode.Text.Length)); //Size to be added
-                    shellcode.AddRange(movESPEAX);
+                    UInt32 len = (UInt32)txtShellcode.Text.Length;
+                    len += 9;
+
+                    if (rb64Bits.Checked)
+                    {
+                        //Calcula alinhamento em 16 bits para que o shellcode funcione corretamente em 64 bits
+                        //seguindo a calling convention
+                        len += 32;
+                        byte[] getRIP = { 0xeb, 0x05, 0x48, 0x8b, 0x04, 0x24, 0xc3, 0xe8, 0xf6, 0xff, 0xff, 0xff };
+                        byte[] movRSPEAX = { 0x48, 0x89, 0xC4 };
+                        byte[] align = { 0x48, 0x83, 0xE0, 0xF0 };
+                        shellcode.AddRange(getRIP);
+                        shellcode.Add(0x05); //ADD EAX
+                        shellcode.AddRange(BitConverter.GetBytes(len)); //Size to be added
+                        shellcode.AddRange(align); //and rax, 0xFFFFFFFFFFFFFFF0 ; Ensure RSP is 16 byte aligned
+                        shellcode.AddRange(movRSPEAX);
+                    }
+                    else
+                    {
+                        byte[] getEIP = { 0xeb, 0x04, 0x8b, 0x04, 0x24, 0xc3, 0xe8, 0xf7, 0xff, 0xff, 0xff };
+                        byte[] movESPEAX = { 0x89, 0xc4 };
+                        shellcode.AddRange(getEIP);
+                        shellcode.Add(0x05); //ADD EAX
+                        shellcode.AddRange(BitConverter.GetBytes(len)); //Size to be added
+                        shellcode.AddRange(movESPEAX);
+                    }
 
                 }
 
