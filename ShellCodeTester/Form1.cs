@@ -22,6 +22,8 @@ namespace ShellCodeTester
         public Form1()
         {
             InitializeComponent();
+
+            //
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -49,7 +51,9 @@ namespace ShellCodeTester
 
         private void btnExecute_Click(object sender, EventArgs e)
         {
+            
             this.Enabled = false;
+            this.BtnDisassemble_Click(sender, e);
             try
             {
                 if (String.IsNullOrEmpty(txtShellcode.Text.Trim()))
@@ -255,6 +259,68 @@ namespace ShellCodeTester
                     return;
                 }
             }
+        }
+
+        private void TxtShellcode_TextChanged(object sender, EventArgs e)
+        {
+            
+        }
+
+        private void BtnDisassemble_Click(object sender, EventArgs e)
+        {
+            System.Reflection.Assembly asm = System.Reflection.Assembly.GetExecutingAssembly();
+            String path = Path.GetDirectoryName(asm.Location);
+
+            FileInfo tmpFile = new FileInfo(Path.Combine(Path.GetTempPath(), "ShellcodeTester.o"));
+
+            List<Byte> shellcode = new List<byte>();
+            try
+            {
+                shellcode.AddRange(StringToByteArray(txtShellcode.Text));
+            }
+            catch
+            {
+                shellcode.Clear();
+            }
+
+            if (shellcode.Count > 0)
+            {
+                File.WriteAllBytes(tmpFile.FullName, shellcode.ToArray());
+
+                Process p = new Process();
+                p.StartInfo.UseShellExecute = false;
+                p.StartInfo.RedirectStandardOutput = true;
+                p.StartInfo.RedirectStandardError = true;
+                p.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+
+                p.StartInfo.FileName = Path.Combine(path, "objdump.exe");
+                if (rb64Bits.Checked)
+                {
+                    p.StartInfo.Arguments = "objdump -D -Mintel,x86-64 -b binary -m i386 \"" + tmpFile.FullName + "\"";
+                }
+                else
+                {
+                    p.StartInfo.Arguments = "objdump -D -Mintel,i386 -b binary -m i386 \"" + tmpFile.FullName + "\"";
+                }
+
+                p.Start();
+                string output = p.StandardOutput.ReadToEnd();
+
+                Int32 offset = output.IndexOf("<.data>:");
+                if (offset > 0)
+                {
+                    output = output.Substring(offset + 8).TrimStart("\r\n".ToCharArray());
+                }
+
+                p.WaitForExit();
+               
+                txtdisassemble.Text = output;
+            }
+            else
+            {
+                txtdisassemble.Text = "Shellcode vazio";
+            }
+
         }
     }
 }

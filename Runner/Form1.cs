@@ -9,7 +9,6 @@ namespace Runner
     public partial class Form1 : Form
     {
         private String[] args;
-        private UInt32 pageSize = 0;
 
         public Form1(string[] args)
         {
