@@ -41,6 +41,7 @@
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.txtdisassemble = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.btnDisassemble = new System.Windows.Forms.Button();
@@ -89,7 +90,7 @@
             // sbStatus
             // 
             this.sbStatus.ImageScalingSize = new System.Drawing.Size(32, 32);
-            this.sbStatus.Location = new System.Drawing.Point(0, 477);
+            this.sbStatus.Location = new System.Drawing.Point(0, 479);
             this.sbStatus.Name = "sbStatus";
             this.sbStatus.Size = new System.Drawing.Size(849, 22);
             this.sbStatus.TabIndex = 4;
@@ -140,7 +141,8 @@
             // 
             this.menuStrip1.ImageScalingSize = new System.Drawing.Size(32, 32);
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.fileToolStripMenuItem});
+            this.fileToolStripMenuItem,
+            this.toolStripMenuItem1});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(849, 24);
@@ -161,6 +163,13 @@
             this.openToolStripMenuItem.Size = new System.Drawing.Size(100, 22);
             this.openToolStripMenuItem.Text = "&Abrir";
             this.openToolStripMenuItem.Click += new System.EventHandler(this.OpenToolStripMenuItem_Click);
+            // 
+            // toolStripMenuItem1
+            // 
+            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(49, 20);
+            this.toolStripMenuItem1.Text = "Sobre";
+            this.toolStripMenuItem1.Click += new System.EventHandler(this.ToolStripMenuItem1_Click);
             // 
             // txtdisassemble
             // 
@@ -195,7 +204,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(849, 499);
+            this.ClientSize = new System.Drawing.Size(849, 501);
             this.Controls.Add(this.btnDisassemble);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.txtdisassemble);
@@ -239,6 +248,7 @@
         private System.Windows.Forms.TextBox txtdisassemble;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Button btnDisassemble;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
     }
 }
 

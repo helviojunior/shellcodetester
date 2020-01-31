@@ -322,5 +322,28 @@ namespace ShellCodeTester
             }
 
         }
+
+        private void ToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+
+            System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
+            FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
+            string version = fvi.FileMajorPart + "." + fvi.FileMinorPart + "." + fvi.FilePrivatePart; ;
+
+            StringBuilder str = new StringBuilder();
+            str.AppendLine("Shellcode Tester criado por M4v3r1ck");
+            str.AppendLine("Versão: " + version);
+            str.AppendLine("helvio_junior [at] hotmail [dot] com");
+
+            str.AppendLine("");
+            str.AppendLine("Disasseble utilizando ObjDump do GNU");
+            str.AppendLine("http://www.gnu.org/software/binutils/");
+
+
+            Form2 frm = new Form2();
+            frm.Text = this.Text;
+            frm.SetText(str.ToString());
+            frm.ShowDialog();
+        }
     }
 }
