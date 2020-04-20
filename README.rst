@@ -20,7 +20,7 @@ ShellCode Tester Linux
 
 Instalation
 =====
-:
+::
     git clone https://github.com/helviojunior/shellcodetester.git
     cd shellcodetester/Linux
     make
@@ -28,10 +28,10 @@ Instalation
 
 Usage
 =====
-Without break-point:
+Without break-point::
     shellcodetestes [file.asm]
 
 
-With break-point (INT3). The break-point will be inserted before our generated shellcode.:
+With break-point (INT3). The break-point will be inserted before our generated shellcode::
     shellcodetestes [file.asm]
 
