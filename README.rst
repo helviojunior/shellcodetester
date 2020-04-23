@@ -31,10 +31,10 @@ Usage
 =====
 Without break-point::
 
-    shellcodetestes [file.asm]
+    shellcodetester [file.asm]
 
 
 With break-point (INT3). The break-point will be inserted before our generated shellcode::
 
-    shellcodetestes [file.asm] --break-point
+    shellcodetester [file.asm] --break-point
 
