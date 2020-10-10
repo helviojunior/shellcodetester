@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 
-echo "Shellcode Tester v1.0"
+echo "Shellcode Tester v1.2"
 
 if [ $# -eq 0 ]
   then
@@ -58,6 +58,7 @@ echo "Gerando arquivo $c_file"
 cat << EOF > $c_file
 #include<stdio.h>
 #include<string.h>
+#include <sys/mman.h>
 
 unsigned char code[] = {
 EOF
@@ -72,9 +73,15 @@ cat << EOF >> $c_file
 void main()
 {
 
-    printf("Shellcode Length:  %d\n", sizeof(code));
+    char *shell;
+    int size = sizeof(code);
+    printf("Shellcode Length:  %d\n", size);
 
-    int (*ret)() = (int(*)())code;
+    shell = (char*)mmap(NULL, size, PROT_READ|PROT_WRITE|PROT_EXEC, MAP_ANON|MAP_SHARED, -1, 0);
+
+    memcpy(shell,code,size);
+
+    int (*ret)() = (int(*)())shell;
 
     ret();
 
