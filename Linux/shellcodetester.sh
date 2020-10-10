@@ -36,9 +36,9 @@ else
 fi
 
 if [ $bits64 -eq 1 ]; then
-    echo "Arquiterura: 64 bits"
+    echo "Arquitetura: 64 bits"
 else
-    echo "Arquiterura: 32 bits"
+    echo "Arquitetura: 32 bits"
     gcc_flags=" -m32 "
 fi
 
