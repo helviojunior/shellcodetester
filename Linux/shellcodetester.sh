@@ -1,73 +1,65 @@
-#!/usr/bin/env bash
+#!/bin/bash
 #
-LANG=C
-LC_ALL=C
 
-#filename="${1%%.*}"
-# Error messages array
-error_msg[1]='Utilização: shellcodetester.sh [-f <arquivo.asm>] [-b <badchars>] [--break-point]'
-error_msg[2]='Erro montando arquivo .asm'
-error_msg[3]='Erro na compilação!'
-error_msg[4]='Opcao Invalida! Usage: shellcodetester.sh [-f <arquivo.asm>] [-b <badchars>] [--break-point]'
-error_msg[5]='Opcao requer um argumento'
+echo "Shellcode Tester v1.2"
 
-#Error message function
-error (){
+if [ $# -eq 0 ]
+  then
+    echo 
+    echo "Utilização: shellcodetester [arquivo.asm] --break-point"
+    echo 
+    exit 1
+fi
 
-  [[ $1 -eq 5 ]] && echo -e "\n\e[31;1m[!]\e[m Opcao -$2 requer argumento"
-  [[ $1 -ne 5 ]] && echo -e "\n\e[31;1m[!]\e[m ${error_msg[$1]}\n"
-  exit $1
+gcc_flags=""
+filename=$(basename -- "$1")
+extension="${filename##*.}"
+filename2="${filename%%.*}"
+c_file="$filename2-shellcodetester.c"
+o_file="$filename2-shellcodetester.o"
+bin_file="$filename2-shellcodetester"
+bp=""
 
-}
-
-while getopts ":f:b:h-:" opts; do
-
-	case ${opts} in
-
-		:) error 5 ${OPTARG}
-		;;
-
-		\?) error 4
-		;;
-
-		-)
-			[[ ${OPTARG} == 'break-point' ]] && echo -e "\n\e[1mAdicionando breakpoint antes do shellcode\e[m" && bp='0xCC' || error 4
-		;;
-
-    h) error 1
-    ;;
-
-		f)
-			filename="${OPTARG%%.*}"
-			fullname="${OPTARG}"
-			gcc_flags=""
-			c_file="$filename-shellcodetester.c"
-			o_file="$filename-shellcodetester.o"
-			bin_file="$filename-shellcodetester.x"
-			bp=""
+for arg in "$@"; do
+    if [ "$arg" == "--break-point" ]; then
+        echo "Adicionando breakpoint antes do shellcode"
+        bp="0xCC,"
+    fi
+done
 
 
-bits64=$(grep -i '\[BITS 64\]' "$fullname")
+bits64=$(grep -i '\[BITS 64\]' "$1")
+if [ $? -eq 0 ]; then
+    bits64=1
+else 
+    bits64=0
+fi
 
-if [[ $bits64 ]]; then
+if [ $bits64 -eq 1 ]; then
     echo "Arquitetura: 64 bits"
 else
     echo "Arquitetura: 32 bits"
     gcc_flags=" -m32 "
 fi
 
-echo -e "Montando arquivo \e[32;1m$fullname\e[m em $o_file"
+echo "Montando arquivo '$filename' em $o_file"
 rm -rf /tmp/sct.o >/dev/null 2>&1
-nasm $fullname -o $o_file
+nasm $1 -o $o_file
 
-[[ $? -ne 0 ]] && error 2
+if [ $? -ne 0 ]; then
+    echo
+    echo "Erro montando arquivo .asm"
+    exit 1
+fi
 
-echo -e "Gerando arquivo \e[4m$c_file\e[m"
+echo "Gerando arquivo $c_file"
+
 
 cat << EOF > $c_file
 #include<stdio.h>
 #include<string.h>
 #include <sys/mman.h>
+
 unsigned char code[] = {
 EOF
 
@@ -75,17 +67,24 @@ echo -n "$bp" >> $c_file
 
 cat $o_file | xxd --include >> $c_file
 
-cat << EOF >> $c_file
+cat << EOF >> $c_file 
 };
+
 void main()
 {
+
     char *shell;
     int size = sizeof(code);
     printf("Shellcode Length:  %d\n", size);
+
     shell = (char*)mmap(NULL, size, PROT_READ|PROT_WRITE|PROT_EXEC, MAP_ANON|MAP_SHARED, -1, 0);
+
     memcpy(shell,code,size);
+
     int (*ret)() = (int(*)())shell;
+
     ret();
+
 }
 EOF
 
@@ -93,22 +92,31 @@ l=$(cat $o_file | wc -c)
 t_payload=$(cat $o_file | xxd -p | tr -d '\n')
 l2=${#t_payload}
 
-echo -e "Compilando arquivo \e[4m$c_file\e[m para \e[32;1m$bin_file\e[m"
-gcc $c_file -o $bin_file $gcc_flags -fno-stack-protector -z execstack
-
-[[ $? -eq 0 ]] || erro 3
-
-echo -e \
-"Montagem e compilação realizada com sucesso.\n
-Tamanho do Payload: $l bytes
-Tamanho do Payload: Tamanho final em hexa: $l2 bytes\n"
-		;;
-
-		b)
-			badchars=${OPTARG}
-			echo $'\e[1mBadchars:\e[m '"${badchars}"''
-			cat $o_file | xxd -p | tr -d '\n' | grep -E --color "${badchars//\\x/|}"
-		;;
-
-		esac
+payload=""
+i=0
+while [ $i -le $l2 ]
+do
+    hex=${t_payload:i:2}
+    if [ "$hex" == "00" ]; then
+        payload="$payload\033[0;31m00\033[0m"
+    else
+        payload="$payload$hex"
+    fi
+    i=$(( $i + 2 ))
 done
+
+echo "Compilando arquivo $c_file para $bin_file"
+gcc $c_file -o $bin_file $gcc_flags -fno-stack-protector -z execstack
+if [ $? -eq 0 ]; then
+    echo "Montagem e compilação realizada com sucesso."
+    echo
+    echo "Tamanho do Payload: $l bytes"
+    echo "Tamanho do Payload: Tamanho final em hexa: $l2 bytes"
+    echo -e "$payload"
+    echo
+    echo "Execute o comando ./$bin_file"
+    echo 
+else
+    echo
+    echo "Erro na compilação!" 
+fi
