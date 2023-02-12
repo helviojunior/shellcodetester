@@ -80,3 +80,8 @@ Custom Settings:
   -v, --verbose                   Shows more options (-h -v). Prints commands and outputs. (default: quiet)
 ```
 
+# Windows Users
+
+Check specific instructions by Windows Users
+
+[Windows Instructions](WINDOWS.md)

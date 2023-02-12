@@ -37,21 +37,21 @@ class ShellcodeTester(object):
         required_apps = [
             {
                 "name": "nasm",
-                "windows": "Install NASM: {G}https://www.nasm.us/{W}",
+                "windows": "Install NASM. Check how-to @ {G}https://github.com/helviojunior/shellcodetester/blob/master/WINDOWS.md{W}",
                 "linux": "Run the command: {G}apt install nasm{W}",
                 "darwin": ("Homebrew install instructions @ {G}https://docs.brew.sh/Installation{W}\n"
                            "And after that run the command: {G}brew install nasm{W}")
             },
             {
                 "name": "gcc",
-                "windows": "Download and install GCC from {G}https://sourceforge.net/projects/mingw/files/MinGW/Base/gcc/{W}",
+                "windows": "Install GCC. Check how-to @ {G}https://github.com/helviojunior/shellcodetester/blob/master/WINDOWS.md{W}",
                 "linux": "Run the command: {G}apt install gcc{W}",
                 "darwin": ("Homebrew install instructions @ {G}https://docs.brew.sh/Installation{W}\n"
                            "And after that run the command: {G}brew install gcc{W}")
             },
             {
                 "name": "objdump",
-                "windows": "Download and install BinUtils from {G}https://sourceforge.net/projects/mingw/files/MinGW/Base/binutils/{W}",
+                "windows": "Install BinUtils. Check how-to @ {G}https://github.com/helviojunior/shellcodetester/blob/master/WINDOWS.md{W}",
                 "linux": "Run the command: {G}apt install binutils{W}",
                 "darwin": ("Homebrew install instructions @ {G}https://docs.brew.sh/Installation{W}\n"
                            "And after that run the command: {G}brew install binutils{W}")

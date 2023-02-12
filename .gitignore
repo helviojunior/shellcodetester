@@ -49,3 +49,6 @@ tmtagsHistory
 build
 dist
 *.egg-info
+
+# Reinclude all Resources Path
+!resources/*
