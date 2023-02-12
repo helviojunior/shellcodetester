@@ -6,7 +6,7 @@
 [![Supported Versions](https://img.shields.io/pypi/pyversions/shellcodetester.svg)](https://pypi.org/project/shellcodetester)
 [![Contributors](https://img.shields.io/github/contributors/helviojunior/shellcodetester.svg)](https://github.com/helviojunior/shellcodetester/graphs/contributors)
 [![PyPI version](https://img.shields.io/pypi/v/shellcodetester.svg)](https://pypi.org/project/shellcodetester/)
-[![License: GPL-3.0](https://img.shields.io/pypi/l/shellcodetester.svg)](https://github.com/helviojunior/shellcodetester/blob/main/LICENSE)
+[![License: GPL-3.0](https://img.shields.io/pypi/l/shellcodetester.svg)](https://github.com/helviojunior/shellcodetester/blob/master/LICENSE)
 
 ShellcodeTester officially supports Python 3.8+.
 
