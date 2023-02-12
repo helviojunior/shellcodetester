@@ -7,7 +7,7 @@ from shellcodetester.util.logger import Logger
 class AsmFile(object):
     file_path = ''
     file_pattern = ''
-    arch = 'x86'
+    arch = 'unsupported'
     assembled_data = None
 
     def __init__(self, filename: str):
@@ -29,9 +29,16 @@ class AsmFile(object):
                             self.arch = 'x86_64'
                             break
 
+                        elif '[bits 32]' in line.lower():
+                            self.arch = 'x86'
+                            break
+
                 try:
                     line = f.readline()
                 except:
                     pass
+
+        if self.arch == 'unsupported':
+            raise Exception('Unknown or unsupported ASM platform')
 
         Logger.debug("ASM architecture: {G}%s" % self.arch)

@@ -53,14 +53,18 @@ class Process(object):
     @staticmethod
     def exists(program):
         ''' Checks if program is installed on this system '''
-        p = Process(['which', program])
-        stdout = p.stdout().strip()
-        stderr = p.stderr().strip()
+        #p = Process(['which', program])
+        #stdout = p.stdout().strip()
+        #stderr = p.stderr().strip()
 
-        if stdout == '' and stderr == '':
-            return False
+        #if stdout == '' and stderr == '':
+        #    return False
 
-        return True
+        #return True
+
+        from shutil import which
+        return which(program) is not None
+
 
     def __init__(self, command, devnull=False, stdout=PIPE, stderr=PIPE, cwd=None, bufsize=0):
         ''' Starts executing command '''

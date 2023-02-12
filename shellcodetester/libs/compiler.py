@@ -9,6 +9,12 @@ from shellcodetester.util.logger import Logger
 from shellcodetester.util.process import Process
 from shellcodetester.util.tools import Tools
 
+_extensions = {
+    'windows': '.exe',
+    'linux': '',
+    'darwin': '',
+}
+
 
 class Compiler(AsmFile):
     c_file = ''
@@ -19,10 +25,13 @@ class Compiler(AsmFile):
         super().__init__(filename)
         self.assembled_data = assembled_data
         self.c_file = Path(f"{self.file_pattern}.c")
-        if self.arch == 'x86_64':
-            self.bin_file = Path(f"{self.file_pattern}.elf64")
-        else:
-            self.bin_file = Path(f"{self.file_pattern}.elf32")
+        self.bin_file = Path(f"{self.get_name()}")
+
+    def get_name(self) -> str:
+        import platform
+        p = platform.system().lower()
+        e = _extensions.get(p, "")
+        return f"{self.file_pattern}-{self.arch}{e}"
 
     def compile(self) -> bool:
 
@@ -106,7 +115,7 @@ class Compiler(AsmFile):
         if self.arch == 'x86':
             gcc_flags += ' -m32'
 
-        # gcc $c_file -o $bin_file $gcc_flags -fno-stack-protector -z execstack
+        # gcc source.c -o executable_file $gcc_flags -fno-stack-protector -z execstack
         (code, out, err) = Process.call(f"gcc \"{self.c_file.resolve()}\" -o \"{self.bin_file.resolve()}\" {gcc_flags}")
         if code != 0:
             Logger.pl('{!} {R}Error assembling {G}%s{R}: \n{W}%s{W}' % (self.file_path.name, err))
@@ -119,12 +128,20 @@ class Compiler(AsmFile):
 
         Logger.debug("File compiled with {G}%s bytes" % stat.st_size)
 
-        if Configuration.breakpoint:
-            Logger.pl(
-                '\n{+} {W}To debug your shellcode execute the command: \n     {O}gdb -q %s{W}\n' % self.bin_file.resolve())
-            return True
+        if Tools.is_platform_windows():
+            if Configuration.breakpoint:
+                Logger.pl(
+                    '\n{+} {W}To debug your shellcode open the following application in your debugger: \n     {O}%s{W}\n' % self.bin_file.resolve())
+                return True
 
-        Logger.pl('\n{+} {W}To execute your shellcode execute the command: \n     {O}%s{W}\n' % self.bin_file.resolve())
+            Logger.pl('\n{+} {W}To execute your shellcode execute the application: \n     {O}%s{W}\n' % self.bin_file.resolve())
+        else:
+            if Configuration.breakpoint:
+                Logger.pl(
+                    '\n{+} {W}To debug your shellcode execute the command: \n     {O}gdb -q %s{W}\n' % self.bin_file.resolve())
+                return True
+
+            Logger.pl('\n{+} {W}To execute your shellcode execute the command: \n     {O}%s{W}\n' % self.bin_file.resolve())
         return True
 
 

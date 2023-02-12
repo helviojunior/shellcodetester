@@ -13,6 +13,7 @@ ShellcodeTester officially supports Python 3.8+.
 ## Main features
 
 * [x] Assembly ASM file (32 and 64 bits)
+* [x] Assembly ASM file to Windows, Linux and MacOS
 * [x] Check badchars
 * [x] Output to several formats
 * [x] Other amazing features...

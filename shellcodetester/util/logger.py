@@ -3,25 +3,26 @@
 import sys
 from ..util.color import Color
 
-NOTSET = 0
+DEFAULT = 0
 INFO = 1
 DEBUG = 2
 
 _levelToName = {
     INFO: 'INFO',
     DEBUG: 'DEBUG',
-    NOTSET: 'NOTSET',
+    DEFAULT: 'DEFAULT',
 }
 _nameToLevel = {
     'INFO': INFO,
     'DEBUG': DEBUG,
-    'NOTSET': NOTSET,
+    'DEFAULT': DEFAULT,
 }
+
 
 class Logger(object):
     ''' Helper object for easily printing colored text to the terminal. '''
     out_file = ''
-    level = NOTSET
+    level = DEFAULT
 
     @staticmethod
     def setLevel(level):
@@ -47,7 +48,7 @@ class Logger(object):
             if rv > DEBUG:
                 rv = DEBUG
             if rv < 0:
-                rv = NOTSET
+                rv = DEFAULT
         elif str(level) == level:
             if level not in _nameToLevel:
                 raise ValueError("Unknown level: %r" % level)

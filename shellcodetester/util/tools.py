@@ -104,3 +104,12 @@ class Tools:
                 num /= 1024.0
         return f"{num:.1f} Y{suffix}"
 
+    @staticmethod
+    def is_platform_windows():
+        import platform
+        return platform.system().lower() == "windows"
+
+    @staticmethod
+    def is_platform_linux():
+        import platform
+        return platform.system().lower() == "linux"

@@ -32,28 +32,49 @@ class ShellcodeTester(object):
 
     def dependency_check(self):
         ''' Check that required programs are installed '''
-        required_apps = ["gcc", "nasm", "objdump"]
-        optional_apps = []
+        import platform
+
+        required_apps = [
+            {
+                "name": "nasm",
+                "windows": "Install NASM: {G}https://www.nasm.us/{W}",
+                "linux": "Run the command: {G}apt install nasm{W}",
+                "darwin": ("Homebrew install instructions @ {G}https://docs.brew.sh/Installation{W}\n"
+                           "And after that run the command: {G}brew install nasm{W}")
+            },
+            {
+                "name": "gcc",
+                "windows": "Download and install GCC from {G}https://sourceforge.net/projects/mingw/files/MinGW/Base/gcc/{W}",
+                "linux": "Run the command: {G}apt install gcc{W}",
+                "darwin": ("Homebrew install instructions @ {G}https://docs.brew.sh/Installation{W}\n"
+                           "And after that run the command: {G}brew install gcc{W}")
+            },
+            {
+                "name": "objdump",
+                "windows": "Download and install BinUtils from {G}https://sourceforge.net/projects/mingw/files/MinGW/Base/binutils/{W}",
+                "linux": "Run the command: {G}apt install binutils{W}",
+                "darwin": ("Homebrew install instructions @ {G}https://docs.brew.sh/Installation{W}\n"
+                           "And after that run the command: {G}brew install binutils{W}")
+            },
+        ]
         missing_required = False
-        missing_optional = False
 
         for app in required_apps:
-            if not Process.exists(app):
-                missing_required = True
-                Color.pl('{!} {R}error: required app {O}%s{R} was not found' % app)
+            name = app.get("name", None)
+            if name is not None and name.strip() != '':
+                if not Process.exists(name):
+                    missing_required = True
+                    Color.pl('{!} {R}error: required app {O}%s{R} was not found' % name)
 
-        for app in optional_apps:
-            if not Process.exists(app):
-                missing_optional = True
-                Color.pl('{!} {O}warning: recommended app {R}%s{O} was not found' % app)
+                    p = platform.system().lower()
+                    txt = app.get(p, "")
+                    if txt is not None and txt.strip() != '':
+                        Color.pl('{?} {O}Instructions to install dependency: ')
+                        Color.pl('{W}%s{W}\n' % txt)
 
         if missing_required:
             Color.pl('{!} {R}required app(s) were not found, exiting.{W}')
             sys.exit(-1)
-
-        if missing_optional:
-            Color.pl('{!} {O}recommended app(s) were not found')
-            Color.pl('{!} {O}ShellcodeTester may not work as expected{W}')
 
     def run(self):
 
