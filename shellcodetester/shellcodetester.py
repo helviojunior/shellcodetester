@@ -24,7 +24,7 @@ class ShellcodeTester(object):
     def main(self):
         ''' Either performs action based on arguments, or starts attack scanning '''
 
-        #self.dependency_check()
+        self.dependency_check()
 
         Configuration.initialize()
 
@@ -32,8 +32,8 @@ class ShellcodeTester(object):
 
     def dependency_check(self):
         ''' Check that required programs are installed '''
-        required_apps = ["gcc", "nasm"]
-        optional_apps = ["objdump"]
+        required_apps = ["gcc", "nasm", "objdump"]
+        optional_apps = []
         missing_required = False
         missing_optional = False
 
