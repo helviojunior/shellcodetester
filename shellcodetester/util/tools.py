@@ -113,3 +113,27 @@ class Tools:
     def is_platform_linux():
         import platform
         return platform.system().lower() == "linux"
+
+    @staticmethod
+    def find_index(data: [bytearray, bytes], pattern: [bytearray, bytes], start=0, end=-1):
+        j = 0
+        i = start
+        if end == -1:
+            l = len(data)
+        else:
+            l = end
+
+        m = len(pattern)
+        while (i < l) and (j < m):
+            if int(data[i]) == int(pattern[j]):
+                j += 1
+            elif j == 1 and int(data[i]) == int(pattern[0]):
+                j = 1
+            else:
+                j = 0
+            i += 1
+
+        if j == m:
+            return i - m
+        else:
+            return -1
