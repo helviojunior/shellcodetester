@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+import tempfile
 import time
 import signal
 import os
@@ -35,11 +35,22 @@ class Process(object):
             if Configuration.verbose > 1:
                 Logger.debug("Executing (Shell): {G}%s" % command)
 
-        pid = Popen(command, cwd=cwd, stdout=PIPE, stderr=PIPE, shell=shell)
-        retcode = pid.wait()
-        (stdout, stderr) = pid.communicate()
+        # it cause hang on windows
+        #pid = Popen(command, cwd=cwd, stdout=PIPE, stderr=PIPE, shell=shell)
+        #retcode = pid.wait()
+        #(stdout, stderr) = pid.communicate()
 
-        # Python 3 compatibility
+        with tempfile.NamedTemporaryFile(mode="w+") as tmp_out, tempfile.NamedTemporaryFile(mode="w+") as tmp_err:
+
+            pid = Popen(command, cwd=cwd, stdout=tmp_out, stderr=tmp_err, shell=shell)
+            retcode = pid.wait()
+
+            # Cursor is after the last write call, reset to read output
+            tmp_out.seek(0)
+            tmp_err.seek(0)
+            stdout = tmp_out.read()
+            stderr = tmp_err.read()
+
         if type(stdout) is bytes: stdout = stdout.decode('utf-8')
         if type(stderr) is bytes: stderr = stderr.decode('utf-8')
 

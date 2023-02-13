@@ -48,7 +48,15 @@ class Compiler(AsmFile):
             with open(self.c_file, 'w', encoding="utf-8") as f:
                 f.write('#include<stdio.h>\n')
                 f.write('#include<string.h>\n')
-                f.write('#include <sys/mman.h>\n')
+                f.write('#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)\n')
+                f.write('   #include<windows.h>\n')
+                f.write('#elif __APPLE__\n')
+                f.write('    #include <sys/mman.h>\n')
+                f.write('#elif __linux__\n')
+                f.write('    #include <sys/mman.h>\n')
+                f.write('#else\n')
+                f.write('#   error "Unknown compiler"\n')
+                f.write('#endif\n')
                 f.write('\n')
                 f.write('unsigned char code[] = {\n')
 
@@ -82,8 +90,18 @@ class Compiler(AsmFile):
                 f.write('    int size = sizeof(code);\n')
                 f.write('    printf("Shellcode Length:  %d\\n", size);\n')
                 f.write('\n')
+                f.write('#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)\n')
+                f.write('    shell = (char*) VirtualAlloc(0, size, MEM_COMMIT, PAGE_EXECUTE_READWRITE);\n')
+                f.write('    if (!shell)\n')
+                f.write('    {\n')
+                f.write('        printf("Error creating memory space");\n')
+                f.write('        free (shell);\n')
+                f.write('        return;\n')
+                f.write('    }\n')
+                f.write('#else\n')
                 f.write(
                     '    shell = (char*)mmap(NULL, size, PROT_READ|PROT_WRITE|PROT_EXEC, MAP_ANON|MAP_SHARED, -1, 0);\n')
+                f.write('#endif\n')
                 f.write('\n')
                 f.write('    memcpy(shell,code,size);\n')
                 f.write('\n')
@@ -111,19 +129,21 @@ class Compiler(AsmFile):
         if self.bin_file.is_file() and self.bin_file.exists():
             self.bin_file.unlink(missing_ok=True)
 
-        gcc_flags = '-fno-stack-protector -z execstack'
+        gcc_flags = '-fno-stack-protector'
+        if not Tools.is_platform_windows():
+            gcc_flags = ' -z execstack'
         if self.arch == 'x86':
             gcc_flags += ' -m32'
 
         # gcc source.c -o executable_file $gcc_flags -fno-stack-protector -z execstack
         (code, out, err) = Process.call(f"gcc \"{self.c_file.resolve()}\" -o \"{self.bin_file.resolve()}\" {gcc_flags}")
         if code != 0:
-            Logger.pl('{!} {R}Error assembling {G}%s{R}: \n{W}%s{W}' % (self.file_path.name, err))
+            Logger.pl('{!} {R}Error assembling {G}%s{R}:{O} \n{W}%s{W}' % (self.file_path.name, err))
             return False
 
         stat = self.bin_file.stat()
         if stat.st_size == 0:
-            Logger.pl('{!} {R}Error compiling {G}%s{R}: %s{W}' % (self.file_path.name, 'Output file is empty'))
+            Logger.pl('{!} {R}Error compiling {G}%s{R}:{O} %s{W}' % (self.file_path.name, 'Output file is empty'))
             return False
 
         Logger.debug("File compiled with {G}%s bytes" % stat.st_size)

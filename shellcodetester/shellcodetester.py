@@ -85,7 +85,8 @@ class ShellcodeTester(object):
 
             # Assembly ASM File
             asm = Assembler(Configuration.asm_file)
-            asm.assembly()
+            if not asm.assembly():
+                sys.exit(2)
 
             if Configuration.verbose >= 1 or any(bc in asm.assembled_data for bc in Configuration.bad_chars):
                 dis = Disassembler(Configuration.asm_file, asm.assembled_data)
@@ -94,8 +95,8 @@ class ShellcodeTester(object):
             asm.print_payload(Configuration.transform_format, Configuration.bad_chars)
 
             comp = Compiler(Configuration.asm_file, asm.assembled_data)
-            comp.compile()
-
+            if not comp.compile():
+                sys.exit(2)
 
         except Exception as e:
             Color.pl("\n{!} {R}Error: {O}%s" % str(e))

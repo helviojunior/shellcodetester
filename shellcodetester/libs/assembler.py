@@ -23,14 +23,15 @@ class Assembler(AsmFile):
         if self.o_file.is_file() and self.o_file.exists():
             self.o_file.unlink(missing_ok=True)
 
-        (code, out, err) = Process.call(f"nasm \"{self.file_path.resolve()}\" -o \"{self.o_file.resolve()}\"")
+        (code, out, err) = Process.call(f"nasm \"{self.file_path.resolve()}\" -o \"{self.o_file.resolve()}\"",
+                                        cwd=self.file_path.parent.resolve())
         if code != 0:
-            Logger.pl('{!} {R}Error assembling {G}%s{R}: %s{W}' % (self.file_path.name, err))
+            Logger.pl('{!} {R}Error assembling {G}%s{R}:{O} %s{W}' % (self.file_path.name, err))
             return False
 
         stat = self.o_file.stat()
         if stat.st_size == 0:
-            Logger.pl('{!} {R}Error assembling {G}%s{R}: %s{W}' % (self.file_path.name, 'Output file is empty'))
+            Logger.pl('{!} {R}Error assembling {G}%s{R}:{O} %s{W}' % (self.file_path.name, 'Output file is empty'))
             return False
 
         with open(self.o_file.resolve(), 'rb') as f:
