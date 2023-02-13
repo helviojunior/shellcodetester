@@ -39,6 +39,9 @@ class Compiler(AsmFile):
             Logger.pl('{!} {R}Error assembling {G}%s{R}: Assembled data is empty{W}' % self.file_path.name)
             return False
 
+        start_sign = self.sign_data
+        end_sign = reversed(start_sign)
+
         Logger.debug("Writing C source code to {G}%s" % self.c_file)
         try:
 
@@ -48,6 +51,8 @@ class Compiler(AsmFile):
             with open(self.c_file, 'w', encoding="utf-8") as f:
                 f.write('#include<stdio.h>\n')
                 f.write('#include<string.h>\n')
+                f.write('\n')
+                f.write('void shell();\n')
                 f.write('\n')
                 f.write('void main() {\n')
                 f.write('\n')
@@ -62,32 +67,20 @@ class Compiler(AsmFile):
                 if Configuration.breakpoint:
                     f.write('    asm("INT3"); // INT3 -> Breakpoint\n')
 
-                pattern = bytearray(b'\x40\x41\x42\x43\x44\x45\x46\x47')
+                f.write('    asm("NOP");\n')
 
-                f.write('    asm("inc %eax");\n')
-                f.write('    asm("inc %ecx");\n')
-                f.write('    asm("inc %edx");\n')
-                f.write('    asm("inc %ebx");\n')
-                f.write('    asm("inc %esp");\n')
-                f.write('    asm("inc %ebp");\n')
-                f.write('    asm("inc %esi");\n')
-                f.write('    asm("inc %edi");\n')
+                pattern = bytearray()
+                for s in start_sign:
+                    pattern += bytearray(s['byte'])
+                    f.write('    asm("%s");\n' % s['asm'])
 
                 for n in range(len(self.assembled_data)):
                     f.write('    asm("NOP");\n')
                     pattern.append(0x90)
 
-                f.write('    asm("NOP");\n')
-                f.write('    asm("inc %edi");\n')
-                f.write('    asm("inc %esi");\n')
-                f.write('    asm("inc %ebp");\n')
-                f.write('    asm("inc %esp");\n')
-                f.write('    asm("inc %ebx");\n')
-                f.write('    asm("inc %edx");\n')
-                f.write('    asm("inc %ecx");\n')
-                f.write('    asm("inc %eax");\n')
-
-                pattern += bytearray(b'\x90\x47\x46\x45\x44\x43\x42\x41\x40')
+                for s in end_sign:
+                    pattern += bytearray(s['byte'])
+                    f.write('    asm("%s");\n' % s['asm'])
 
                 if Configuration.fill:
                     for n in range(4096 - len(self.assembled_data)):
@@ -164,7 +157,7 @@ class Compiler(AsmFile):
 
         idx = Tools.find_index(bin_data, pattern)
         if idx == -1:
-            Logger.pl('{!} {R}Error putting the shellcode at {G}%s{R}:{O} %s{W}' % (file.name, 'Find pattern1 not found'))
+            Logger.pl('{!} {R}Error putting the shellcode at {G}%s{R}:{O} %s{W}' % (file.name, 'Find pattern not found'))
             return False
 
         if idx + len(replace_to) > len(bin_data):
@@ -172,24 +165,12 @@ class Compiler(AsmFile):
                 '{!} {R}Error putting the shellcode at {G}%s{R}:{O} %s{W}' % (file.name, 'replace_to data is greater than binary file'))
             return False
 
-        p2 = bytearray(b'\x90\x47\x46\x45\x44\x43\x42\x41\x40')
-        idx2 = Tools.find_index(bin_data, p2, idx + 5)
-        if idx2 == -1:
-            Logger.pl('{!} {R}Error putting the shellcode at {G}%s{R}:{O} %s{W}' % (file.name, 'Find pattern2 not found'))
-            return False
-
-        idx2 += len(p2)
-        if len(replace_to) > idx2 - idx:
-            Logger.pl(
-                '{!} {R}Error putting the shellcode at {G}%s{R}:{O} %s{W}' % (file.name, 'replace_to data is greater than expected'))
-            return False
-
         fill_data = bytearray(replace_to)
 
-        for n in range((idx2 - idx) - len(replace_to)):
+        for n in range(len(pattern) - len(replace_to)):
             fill_data.append(0x90)
 
-        new_data = bin_data[0:idx] + fill_data + bin_data[idx2:]
+        new_data = bin_data[0:idx] + fill_data + bin_data[idx + len(pattern):]
 
         with open(file.resolve(), 'wb') as f:
             f.write(new_data)
