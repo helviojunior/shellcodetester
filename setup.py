@@ -16,13 +16,9 @@ git commit -m "Update build version"
 '''
 
 import os
-from setuptools import setup, find_packages
+import sys
 
-requires = [
-    'colorama',
-    'tabulate>=0.9.0',
-    'pathlib>=1.0.1'
-]
+from setuptools import setup, find_packages
 
 meta = {}
 here = os.path.abspath(os.path.dirname(__file__))
@@ -30,7 +26,14 @@ here = os.path.abspath(os.path.dirname(__file__))
 with open('shellcodetester/__meta__.py') as f:
     exec(f.read(), meta)
 
-with open("README.md", "r", encoding="utf-8") as f:
+with open(f"{here}/requirements.txt", "r", encoding="utf-8") as f:
+    requires = f.read().splitlines()
+    if not requires:
+        print("Unable to read requirements from the requirements.txt file"
+              "That indicates this copy of the source code is incomplete.")
+        sys.exit(2)
+
+with open(f"{here}/README.md", "r", encoding="utf-8") as f:
     readme = f.read()
 
 setup(
@@ -44,6 +47,7 @@ setup(
     url=meta["__url__"],
     packages=find_packages(),
     package_data={"": ["LICENSE"]},
+    data_files=[('', ['requirements.txt'])],
     include_package_data=False,
     python_requires=">=3.8, <4",
     install_requires=requires,
