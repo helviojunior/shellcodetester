@@ -34,9 +34,47 @@ jobs:
         run: |
           flake8 . --count --ignore=E1,E2,E3,E501,W291,W293 --exit-zero --max-complexity=65 --max-line-length=127 --statistics
 
+  binutils:
+    name: Build Binutils Linux
+    needs: lint
+    runs-on: ubuntu-latest
+    if:
+      github.event_name == 'push' || github.event.pull_request.head.repo.full_name !=
+      github.repository
+
+    strategy:
+      fail-fast: false
+
+    steps:
+      - name: Set up GCC
+        uses: egor-tensin/setup-gcc@v1
+        with:
+          version: latest
+          platform: x64
+
+      - name: Install Python dependencies
+        run: |
+          apt install -y texinfo flex bison libgmp-dev libmpfr-dev make wget
+        with:
+          version: '2.40'
+          platform: 'x86_64-pc-linux-gnu'
+
+      - name: Download binutils
+        run: |
+          wget http://ftp.gnu.org/gnu/binutils/binutils-$version.tar.gz
+          tar xzf binutils-$version.tar.gz
+
+      - name: Build binutils
+        run: |
+          cd binutils-$version
+          CC=gcc ./configure --target=$platform --disable-nls
+          make configure-host
+          make LDFLAGS="-all-static"
+          ./binutils/objdump --version
+
   build:
     name: Build
-    needs: lint
+    needs: binutils
     runs-on: ubuntu-latest
     if:
       github.event_name == 'push' || github.event.pull_request.head.repo.full_name !=

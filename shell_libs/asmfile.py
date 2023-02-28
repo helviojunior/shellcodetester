@@ -2,7 +2,7 @@ from pathlib import Path
 from random import shuffle
 
 from shellcodetester.config import Configuration
-from shelllibs.logger import Logger
+from shell_libs.logger import Logger
 
 _x86Instruction = [
     {'asm': 'inc %eax', 'byte': b'\x40'},
@@ -58,28 +58,29 @@ class AsmFile(object):
 
         Logger.debug("Reading file {G}%s" % self.file_path.name)
 
-        with open(self.file_path.resolve(), 'r', errors="surrogateescape") as f:
-            line = f.readline()
-            while line:
+        if self.file_path.exists():
+            with open(self.file_path.resolve(), 'r', errors="surrogateescape") as f:
+                line = f.readline()
+                while line:
 
-                check_txt = line.strip(' \t')
-                if len(check_txt) > 0:
-                    if check_txt[0] != "#" and check_txt[0] != ";":
-                        if '[bits 64]' in line.lower():
-                            self.arch = 'x86_64'
-                            break
+                    check_txt = line.strip(' \t')
+                    if len(check_txt) > 0:
+                        if check_txt[0] != "#" and check_txt[0] != ";":
+                            if '[bits 64]' in line.lower():
+                                self.arch = 'x86_64'
+                                break
 
-                        elif '[bits 32]' in line.lower():
-                            self.arch = 'x86'
-                            break
+                            elif '[bits 32]' in line.lower():
+                                self.arch = 'x86'
+                                break
 
-                try:
-                    line = f.readline()
-                except:
-                    pass
+                    try:
+                        line = f.readline()
+                    except:
+                        pass
 
         if self.arch == 'unsupported':
-            raise Exception('Unknown or unsupported ASM platform')
+            raise Exception('Unknown or unsupported ASM architecture')
 
         lst = _x86Instruction
         if self.arch == 'x86_64':

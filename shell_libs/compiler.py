@@ -2,10 +2,10 @@ import errno
 from pathlib import Path
 
 from shellcodetester.config import Configuration
-from shelllibs.asmfile import AsmFile
-from shelllibs.logger import Logger
-from shelllibs.process import Process
-from shelllibs.tools import Tools
+from shell_libs.asmfile import AsmFile
+from shell_libs.logger import Logger
+from shell_libs.process import Process
+from shell_libs.tools import Tools
 
 _extensions = {
     'windows': '.exe',

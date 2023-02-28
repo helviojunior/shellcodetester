@@ -1,23 +1,42 @@
 from pathlib import Path
 
 from shell_libs.asmfile import AsmFile
+from shell_libs.disassembler import Disassembler
 from shell_libs.transform import Transform
 from shell_libs.logger import Logger
 from shell_libs.process import Process
+import tempfile, os
 
 
-class Assembler(AsmFile):
+class InlineAssembler(AsmFile):
     o_file = ''
     assembled_data = None
 
-    def __init__(self, filename):
+    def __init__(self, instructions, arch: str = 'x86'):
+
+        filename = os.path.join(tempfile.mkdtemp(), 'nasmshell.asm')
+        if os.path.isfile(filename):
+            os.unlink(filename)
+
+        with open(filename, 'w', encoding='utf-8') as f:
+            if arch.lower() == 'x86_64':
+                f.write("[BITS 64]\n")
+            else:
+                f.write("[BITS 32]\n")
+
+            f.write("section .text\n")
+            f.write("_start:\n")
+
+            if isinstance(instructions, list):
+                f.write('\n'.join(instructions))
+            else:
+                f.write(f"{instructions}\n")
+            f.flush()
+
         super().__init__(filename)
         self.o_file = Path(f"{self.file_pattern}.o")
 
     def assembly(self) -> bool:
-
-        Logger.pl('{+} {W}Assembling {G}%s{W} file {O}%s{W} to {O}%s{W}' % (
-            self.arch, self.file_path.name, self.o_file.resolve()))
 
         if self.o_file.is_file() and self.o_file.exists():
             self.o_file.unlink(missing_ok=True)
@@ -36,9 +55,13 @@ class Assembler(AsmFile):
         with open(self.o_file.resolve(), 'rb') as f:
             self.assembled_data = f.read(stat.st_size)
 
-        Logger.debug("File assembled with {G}%s bytes" % len(self.assembled_data))
-
         return True
+
+    def get_disassembler(self) -> Disassembler:
+        return Disassembler(
+            filename=self.file_path.resolve(),
+            assembled_data=bytearray(self.assembled_data)
+        )
 
     def print_payload(self, format: str = 'c', bad_chars: [bytearray, bytes] = bytearray()):
         Logger.pl('{+} {W}Payload size: {G}%s{W} bytes{W}' % len(self.assembled_data))

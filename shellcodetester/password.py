@@ -2,8 +2,7 @@ import hashlib
 import codecs
 import unicodedata
 
-from shellcodetester.util.color import Color
-from shellcodetester.util.tools import Tools
+from shell_libs.color import Color
 from math import log
 from Levenshtein import ratio
 

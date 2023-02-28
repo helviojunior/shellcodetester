@@ -5,7 +5,7 @@ import string, random, sys, re
 import unicodedata
 from tabulate import tabulate
 
-from shelllibs.color import Color
+from shell_libs.color import Color
 
 
 class Tools:

@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 # -*- coding: UTF-8 -*-
-from shelllibs.color import Color
+from shell_libs.color import Color
 
 DEFAULT = 0
 INFO = 1

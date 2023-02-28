@@ -6,8 +6,8 @@ import os
 
 from subprocess import Popen, PIPE
 
-from shelllibs.logger import Logger
-from shelllibs.color import Color
+from shell_libs.logger import Logger
+from shell_libs.color import Color
 from shellcodetester.config import Configuration
 
 
