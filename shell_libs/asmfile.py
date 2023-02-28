@@ -2,7 +2,7 @@ from pathlib import Path
 from random import shuffle
 
 from shellcodetester.config import Configuration
-from shellcodetester.util.logger import Logger
+from shelllibs.logger import Logger
 
 _x86Instruction = [
     {'asm': 'inc %eax', 'byte': b'\x40'},

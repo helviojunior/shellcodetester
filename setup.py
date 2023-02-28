@@ -7,10 +7,10 @@ The build version is auto update by local git hook at .git/hooks/pre-push with t
 #!/bin/bash
 
 build=$(printf '0x%x' $(date +%s))
-meta=$(cat shellcodetester/__meta__.py | sed "s/__build__.*/__build__ = "${build}"/")
-echo "$meta" > shellcodetester/__meta__.py
+meta=$(cat shell_libs/__meta__.py | sed "s/__build__.*/__build__ = "${build}"/")
+echo "$meta" > shell_libs/__meta__.py
 
-git add ./shellcodetester/__meta__.py
+git add ./shell_libs/__meta__.py
 git commit -m "Update build version"
 
 '''
@@ -23,7 +23,7 @@ from setuptools import setup, find_packages
 meta = {}
 here = os.path.abspath(os.path.dirname(__file__))
 
-with open('shellcodetester/__meta__.py') as f:
+with open(f"{here}/shell_libs/__meta__.py") as f:
     exec(f.read(), meta)
 
 with open(f"{here}/requirements.txt", "r", encoding="utf-8") as f:
@@ -47,7 +47,11 @@ setup(
     url=meta["__url__"],
     packages=find_packages(),
     package_data={"": ["LICENSE"]},
-    data_files=[('', ['requirements.txt'])],
+    data_files=[('', [
+        'requirements.txt',
+        'resources/objdump*',
+        'resources/nasm*'
+    ])],
     include_package_data=False,
     python_requires=">=3.7, <4",
     install_requires=requires,
@@ -77,6 +81,7 @@ setup(
     ],
     entry_points={'console_scripts': [
         'shellcodetester=shellcodetester.shellcodetester:run',
+        'nasm_shell=nasmshell.nasmshell:run',
         ]
     },
     project_urls={

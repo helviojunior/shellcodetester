@@ -1,28 +1,33 @@
 import re
 from pathlib import Path
 
-from shellcodetester.libs.asmfile import AsmFile
-from shellcodetester.util.logger import Logger
-from shellcodetester.util.process import Process
+from shelllibs.asmfile import AsmFile
+from shelllibs.logger import Logger
+from shelllibs.process import Process
 
 
 class Disassembler(AsmFile):
     assembled_data = None
 
-    def __init__(self, filename: str, assembled_data: bytearray):
+    def __init__(self, filename: str, assembled_data: [bytearray, bytes] = bytearray()):
         super().__init__(filename)
         self.assembled_data = assembled_data
         self.o_file = Path(f"{self.file_pattern}.o")
-        if self.arch == 'x86_64':
-            self.bin_file = Path(f"{self.file_pattern}.elf64")
-        else:
-            self.bin_file = Path(f"{self.file_pattern}.elf32")
 
-    def dump(self, bad_chars: [bytearray, bytes] = bytearray()):
-        Logger.pl('{+} {W}Disassembly of {G}%s{W}' % self.o_file.name)
-        cmd = f"objdump -D -Mintel,i386 -b binary -m i386 \"{self.o_file.resolve()}\""
-        if self.arch == 'x86_64':
-            cmd = f"objdump -D -Mintel,x86-64 -b binary -m i386 \"{self.o_file.resolve()}\""
+    def dump(self, bad_chars: [bytearray, bytes] = bytearray(), quiet: bool = False):
+        import platform
+        if not quiet:
+            Logger.pl('{+} {W}Disassembly of {G}%s{W}' % self.o_file.name)
+
+        p = platform.system().lower()
+        if p == "darwin":
+            cmd = f"objdump -D -Mintel,i386 \"{self.o_file.resolve()}\""
+            if self.arch == 'x86_64':
+                cmd = f"objdump -D -Mintel,x86-64 \"{self.o_file.resolve()}\""
+        else:
+            cmd = f"objdump -D -Mintel,i386 -b binary -m i386 \"{self.o_file.resolve()}\""
+            if self.arch == 'x86_64':
+                cmd = f"objdump -D -Mintel,x86-64 -b binary -m i386 \"{self.o_file.resolve()}\""
 
         (code, out, err) = Process.call(cmd)
         if code != 0:

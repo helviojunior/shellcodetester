@@ -6,9 +6,9 @@ import os
 
 from subprocess import Popen, PIPE
 
-from shellcodetester.util.logger import Logger
-from ..util.color import Color
-from ..config import Configuration
+from shelllibs.logger import Logger
+from shelllibs.color import Color
+from shellcodetester.config import Configuration
 
 
 class Process(object):

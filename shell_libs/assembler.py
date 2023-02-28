@@ -1,10 +1,9 @@
 from pathlib import Path
 
-from shellcodetester.libs.asmfile import AsmFile
-from shellcodetester.libs.transform import Transform
-from shellcodetester.util.logger import Logger
-from shellcodetester.util.process import Process
-from shellcodetester.util.tools import Tools
+from shelllibs.asmfile import AsmFile
+from shelllibs.transform import Transform
+from shelllibs.logger import Logger
+from shelllibs.process import Process
 
 
 class Assembler(AsmFile):

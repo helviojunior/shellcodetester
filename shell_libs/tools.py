@@ -3,9 +3,9 @@
 import os
 import string, random, sys, re
 import unicodedata
-from tabulate import _table_formats, tabulate
+from tabulate import tabulate
 
-from shellcodetester.util.color import Color
+from shelllibs.color import Color
 
 
 class Tools:
