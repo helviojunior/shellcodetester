@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
+import platform
 import tempfile
 import time
 import signal
 import os
+from pathlib import Path
 
 from subprocess import Popen, PIPE
 
@@ -40,9 +42,12 @@ class Process(object):
         #retcode = pid.wait()
         #(stdout, stderr) = pid.communicate()
 
+        my_env = os.environ.copy()
+        my_env["PATH"] = Process.get_path()
+
         with tempfile.NamedTemporaryFile(mode="w+") as tmp_out, tempfile.NamedTemporaryFile(mode="w+") as tmp_err:
 
-            pid = Popen(command, cwd=cwd, stdout=tmp_out, stderr=tmp_err, shell=shell)
+            pid = Popen(command, env=my_env, cwd=cwd, stdout=tmp_out, stderr=tmp_err, shell=shell)
             retcode = pid.wait()
 
             # Cursor is after the last write call, reset to read output
@@ -62,6 +67,17 @@ class Process(object):
         return (retcode, stdout, stderr)
 
     @staticmethod
+    def get_path():
+        p = platform.system().lower()
+        if p == 'darwin':
+            p = 'macosx'
+
+        bin_path = Path(os.path.dirname(__file__) + f'../bin/{p}')
+        my_env = os.environ.copy()
+        return f"{bin_path}:" + my_env["PATH"]
+
+
+    @staticmethod
     def exists(program):
         ''' Checks if program is installed on this system '''
         #p = Process(['which', program])
@@ -74,7 +90,7 @@ class Process(object):
         #return True
 
         from shutil import which
-        return which(program) is not None
+        return which(program, path=Process.get_path()) is not None
 
 
     def __init__(self, command, devnull=False, stdout=PIPE, stderr=PIPE, cwd=None, bufsize=0):

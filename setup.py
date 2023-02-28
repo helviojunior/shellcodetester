@@ -17,8 +17,10 @@ git commit -m "Update build version"
 
 import os
 import sys
+from pathlib import Path
 
 from setuptools import setup, find_packages
+from os import walk
 
 meta = {}
 here = os.path.abspath(os.path.dirname(__file__))
@@ -36,6 +38,13 @@ with open(f"{here}/requirements.txt", "r", encoding="utf-8") as f:
 with open(f"{here}/README.md", "r", encoding="utf-8") as f:
     readme = f.read()
 
+bin_files = []
+if os.path.isdir(f"{here}/bin"):
+    bin_files = [
+        os.path.join(dp, f).replace(here.strip('/') + '/', '').lstrip('/. ')
+        for dp, dn, filenames in os.walk(f"{here}/bin") for f in filenames
+    ]
+
 setup(
     name=meta["__title__"],
     version=meta["__version__"],
@@ -47,11 +56,7 @@ setup(
     url=meta["__url__"],
     packages=find_packages(),
     package_data={"": ["LICENSE"]},
-    data_files=[('', [
-        'requirements.txt',
-        'resources/objdump*',
-        'resources/nasm*'
-    ])],
+    data_files=[('', ['requirements.txt'] + bin_files)],
     include_package_data=False,
     python_requires=">=3.7, <4",
     install_requires=requires,
