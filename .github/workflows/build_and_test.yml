@@ -46,6 +46,9 @@ jobs:
     if:
       github.event_name == 'push' || github.event.pull_request.head.repo.full_name !=
       github.repository
+    env:
+      bin_version: '2.40'
+      bin_platform: 'x86_64-pc-linux-gnu'
 
     strategy:
       fail-fast: false
@@ -57,22 +60,21 @@ jobs:
           version: latest
           platform: x64
 
-      - name: Install Python dependencies
-        run: |
-          apt install -y texinfo flex bison libgmp-dev libmpfr-dev make wget
+      - name: Install dependencies
+        uses: awalsh128/cache-apt-pkgs-action@latest
         with:
-          version: '2.40'
-          platform: 'x86_64-pc-linux-gnu'
+          packages: texinfo flex bison libgmp-dev libmpfr-dev make wget
+          version: 1.0
 
       - name: Download binutils
         run: |
-          wget http://ftp.gnu.org/gnu/binutils/binutils-$version.tar.gz
-          tar xzf binutils-$version.tar.gz
+          wget http://ftp.gnu.org/gnu/binutils/binutils-$bin_version.tar.gz
+          tar xzf binutils-$bin_version.tar.gz
 
       - name: Build binutils
         run: |
-          cd binutils-$version
-          CC=gcc ./configure --target=$platform --disable-nls
+          cd binutils-bin_version
+          CC=gcc ./configure --target=$bin_platform --disable-nls
           make configure-host
           make LDFLAGS="-all-static"
           ./binutils/objdump --version
