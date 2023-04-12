@@ -231,7 +231,17 @@ jobs:
           path: /tmp/binutils.zip
           retention-days: 3
 
+      - name: Get last release files
+        id: checkurls
+        run: |
+          url1=$(curl -s https://api.github.com/repos/helviojunior/shellcodetester/releases/latest | jq -r '.assets[] | select(.name|match("mingw-latest.zip$")) | .browser_download_url')
+          url2=$(curl -s https://api.github.com/repos/helviojunior/shellcodetester/releases/latest | jq -r '.assets[] | select(.name|match("binutils.zip$")) | .browser_download_url')
+          echo "::set-output name=MINGW_URL::${url1}"
+          echo "::set-output name=BINUTILS_URL::${url2}"
+
       - name: Upload binutils release asset
+        if:
+          steps.checkurls.outputs.BINUTILS_URL == ''
         id: upload-binutils
         uses: actions/upload-release-asset@v1
         env:
@@ -244,6 +254,8 @@ jobs:
           asset_content_type: application/zip
 
       - name: Upload mingw64 release asset
+        if:
+          steps.checkurls.outputs.MINGW_URL == ''
         id: upload-mingw
         uses: actions/upload-release-asset@v1
         env:
