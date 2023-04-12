@@ -190,7 +190,7 @@ jobs:
       - name: Install dependencies
         uses: awalsh128/cache-apt-pkgs-action@latest
         with:
-          packages: rpm2cpio wget
+          packages: rpm2cpio wget 7zip
           version: 1.0
 
       - name: Download arfactory (linux)
@@ -233,9 +233,16 @@ jobs:
 
       - name: Download objdump
         run: |
-          wget -O /tmp/binutils.tar.xz https://razaoinfo.dl.sourceforge.net/project/mingw/MinGW/Base/binutils/binutils-2.28/binutils-2.28-1-mingw32-bin.tar.xz
-          tar xvf /tmp/binutils.tar.xz -C /tmp/
-          cp /tmp/bin/objdump.exe shell_bins/windows/objdump.exe
+          wget -O /tmp/binutils.7z https://razaoinfo.dl.sourceforge.net/project/mingw-w64/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/8.1.0/threads-win32/seh/x86_64-8.1.0-release-win32-seh-rt_v6-rev0.7z
+          7z x binutils.7z -o/tmp/ *objdump.exe -r -aoa
+          cp /tmp/mingw64/bin/objdump.exe shell_bins/windows/objdump.exe
+
+      - name: Download libiconv
+        run: |
+          wget -O /tmp/libiconv.zip https://razaoinfo.dl.sourceforge.net/project/gnuwin32/libiconv/1.9.2-1/libiconv-1.9.2-1-bin.zip
+          unzip -jo /tmp/libiconv.zip -d /tmp/
+          cp /tmp/bin/libcharset1.dll shell_bins/windows/libcharset1.dll
+          cp /tmp/bin/libiconv2.dll shell_bins/windows/libiconv-2.dll
 
       - name: Install Python dependencies
         run: |
