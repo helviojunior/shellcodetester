@@ -39,39 +39,9 @@ jobs:
         run: |
           flake8 . --count --ignore=E1,E2,E3,E501,W291,W293 --exit-zero --max-complexity=65 --max-line-length=127 --statistics
 
-  binutils_macosx:
-    name: Build macosx binaries
-    needs: lint
-    runs-on: macos-latest
-    if:
-      github.event_name == 'push' || github.event.pull_request.head.repo.full_name !=
-      github.repository
-    env:
-      bin_version: '2.40'
-      bin_platform: 'x86_64-pc-darwin'
-
-    strategy:
-      fail-fast: false
-
-    steps:
-      - name: Install Homebrew
-        run: |
-          NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-          brew install binutils
-
-      - name: Build binutils
-        run: |
-          cp $(which objdump) ${{ github.workspace }}/objdump_macosx
-
-      - uses: actions/upload-artifact@v2
-        with:
-          name: objdump_macosx
-          path: ${{ github.workspace }}/objdump_macosx
-          retention-days: 3
-
   test:
     name: Run unit tests and build wheel
-    needs: binutils_macosx
+    needs: lint
     runs-on: ${{ matrix.os }}
     if:
       github.event_name == 'push' || github.event.pull_request.head.repo.full_name !=
@@ -117,6 +87,36 @@ jobs:
       - name: Build artifact
         run: |
           python setup.py sdist
+
+  binutils_macosx:
+    name: Build macosx binaries
+    needs: test
+    runs-on: macos-latest
+    if:
+      github.event_name == 'push' || github.event.pull_request.head.repo.full_name !=
+      github.repository
+    env:
+      bin_version: '2.40'
+      bin_platform: 'x86_64-pc-darwin'
+
+    strategy:
+      fail-fast: false
+
+    steps:
+      - name: Install Homebrew
+        run: |
+          NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+          brew install binutils
+
+      - name: Build binutils
+        run: |
+          cp $(which objdump) ${{ github.workspace }}/objdump_macosx
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: objdump_macosx
+          path: ${{ github.workspace }}/objdump_macosx
+          retention-days: 3
 
   binutils_linux:
     name: Build linux binaries
@@ -168,7 +168,7 @@ jobs:
 
   publish:
     name: Publish on Test Environment
-    needs: binutils_linux
+    needs: binutils_linux, binutils_macosx
     runs-on: ubuntu-latest
     if:
       github.event_name == 'push' || github.event.pull_request.head.repo.full_name !=
