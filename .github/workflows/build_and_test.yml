@@ -148,7 +148,7 @@ jobs:
         uses: actions/download-artifact@v3
         id: download
         with:
-          name: mingw-latest.zip
+          name: binutils.zip
           path: /tmp/
 
       - name: Copy binaries
@@ -156,11 +156,11 @@ jobs:
           mkdir shell_bins/linux/
           mkdir shell_bins/windows/
           mkdir shell_bins/macosx/
+          unzip -o ${{steps.mingwbuild.outputs.download-path}}/binutils.zip -d shell_bins/
           echo "" > shell_bins/__init__.py
           echo "" > shell_bins/linux/__init__.py
           echo "" > shell_bins/windows/__init__.py
           echo "" > shell_bins/macosx/__init__.py
-          unzip -o ${{steps.mingwbuild.outputs.download-path}}/binutils.zip -d shell_bins/
 
       - name: Install Python dependencies
         run: |
