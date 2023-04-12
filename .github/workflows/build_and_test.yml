@@ -111,7 +111,7 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: binutils.zip
-          path: $GITHUB_WORKSPACE/binutils.zip
+          path: ${{ GITHUB_WORKSPACE }}/binutils.zip
           retention-days: 3
 
   publish:
