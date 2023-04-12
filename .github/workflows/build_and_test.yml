@@ -206,28 +206,28 @@ jobs:
 
       - name: Download arfactory (MacOS)
         uses: actions/download-artifact@v3
-        id: download
+        id: nasm_macos
         with:
           name: nasm_macos
           path: /tmp/
 
       - name: Download arfactory (linux)
         uses: actions/download-artifact@v3
-        id: download
+        id: objdump_linux
         with:
           name: objdump_linux
           path: /tmp/
 
       - name: Download arfactory (windows)
         uses: actions/download-artifact@v3
-        id: download
+        id: objdump_windows
         with:
           name: objdump.exe
           path: /tmp/
 
       - name: Download arfactory (windows)
         uses: actions/download-artifact@v3
-        id: download
+        id: nasm_windows
         with:
           name: nasm.exe
           path: /tmp/
