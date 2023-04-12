@@ -48,7 +48,7 @@ jobs:
 
       - name: Download last release
         run: |
-          wget -O /tmp/mingw-latest.zip https://github.com/helviojunior/shellcodetester/releases/latest/download/mingw-latest.zip
+          wget -O /tmp/mingw-latest.zip https://github.com/helviojunior/shellcodetester/releases/v0.2.3/download/mingw-latest.zip
 
       - uses: actions/upload-artifact@v2
         with:
