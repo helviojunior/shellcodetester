@@ -173,6 +173,7 @@ jobs:
 
       - name: Download arfactory (windows)
         uses: actions/download-artifact@v3
+        id: mingwbuild
         with:
           name: mingw-latest.zip
           path: /tmp/
