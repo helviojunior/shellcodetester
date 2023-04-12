@@ -90,7 +90,7 @@ jobs:
 
   build_windows:
     name: Build windows binaries
-    needs: test
+    needs: lint
     runs-on: ubuntu-latest
     steps:
 
@@ -116,9 +116,9 @@ jobs:
             gcc             \
             g++
 
-      - name: build 64-bit
+      - name: Build 64-bit
         id: build64
-        run: ./resources/build.sh 64
+        run: chmod +x ./resources/build.sh && ./resources/build.sh 64
 
       - name: set file
         run: echo "${{ steps.build64.outputs.OUTPUT_BINARY }}" > /tmp/windows_artifact.txt
