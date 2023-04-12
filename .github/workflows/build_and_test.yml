@@ -89,7 +89,7 @@ jobs:
           python setup.py sdist
 
   get_builds:
-    name: Build windows binaries
+    name: Get last released binaries
     needs: lint
     runs-on: ubuntu-latest
     steps:
@@ -105,10 +105,8 @@ jobs:
 
       - name: Download last release
         run: |
-          mkdir $GITHUB_WORKSPACE/
-          cd $GITHUB_WORKSPACE/
-          wget -O ./mingw-latest.zip https://github.com/helviojunior/shellcodetester/releases/latest/download/mingw-latest.zip
-          wget -O ./binutils.zip https://github.com/helviojunior/shellcodetester/releases/latest/download/binutils.zip
+          wget -O $GITHUB_WORKSPACE/mingw-latest.zip https://github.com/helviojunior/shellcodetester/releases/latest/download/mingw-latest.zip
+          wget -O $GITHUB_WORKSPACE/binutils.zip https://github.com/helviojunior/shellcodetester/releases/latest/download/binutils.zip
 
       - uses: actions/upload-artifact@v2
         with:
