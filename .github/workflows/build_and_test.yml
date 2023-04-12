@@ -144,7 +144,7 @@ jobs:
           packages: rpm2cpio wget 7zip
           version: 1.0
 
-      - name: Download arfactory (linux)
+      - name: Download arfactory
         uses: actions/download-artifact@v3
         id: download
         with:
