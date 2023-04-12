@@ -39,9 +39,38 @@ jobs:
         run: |
           flake8 . --count --ignore=E1,E2,E3,E501,W291,W293 --exit-zero --max-complexity=65 --max-line-length=127 --statistics
 
+  binutils_windows:
+    name: Download Binutils Windows
+    needs: lint
+    runs-on: ubuntu-latest
+    if:
+      github.event_name == 'push' || github.event.pull_request.head.repo.full_name !=
+      github.repository
+    env:
+      bin_version: '2.28'
+
+    strategy:
+      fail-fast: false
+
+    steps:
+
+      - name: Download binutils
+        run: |
+          mkdir $GITHUB_WORKSPACE/binutils/
+          cd $GITHUB_WORKSPACE/binutils/
+          wget -O ./binutils.tar.xz https://razaoinfo.dl.sourceforge.net/project/mingw/MinGW/Base/binutils/binutils-$bin_version/binutils-$bin_version-1-mingw32-bin.tar.xz
+          tar xvf binutils.tar.xz
+          cp ./bin/objdump.exe ${{ github.workspace }}/objdump_windows.exe
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: objdump_windows.exe
+          path: ${{ github.workspace }}/objdump_windows.exe
+          retention-days: 3
+
   binutils_linux:
     name: Build Binutils Linux
-    needs: lint
+    needs: binutils_windows
     runs-on: ubuntu-latest
     if:
       github.event_name == 'push' || github.event.pull_request.head.repo.full_name !=
@@ -119,17 +148,25 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Download arfactory
+      - name: Download arfactory (linux)
         uses: actions/download-artifact@v3
         id: download
         with:
           name: objdump_linux
           path: /tmp/
 
+      - name: Download arfactory (windows)
+        uses: actions/download-artifact@v3
+        id: download
+        with:
+          name: objdump_windows.exe
+          path: /tmp/
+
       - name: Copy binaries
         run: |
-          mkdir bin/linux/
+          mkdir bin/{linux,windows,macos}/
           cp ${{steps.download.outputs.download-path}}/objdump_linux bin/linux/objdump
+          cp ${{steps.download.outputs.download-path}}/objdump_windows.exe bin/windows/objdump.exe
 
       - name: Install Python dependencies
         run: |
