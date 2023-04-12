@@ -95,9 +95,6 @@ jobs:
     if:
       github.event_name == 'push' || github.event.pull_request.head.repo.full_name !=
       github.repository
-    env:
-      bin_version: '2.40'
-      bin_platform: 'x86_64-pc-darwin'
 
     strategy:
       fail-fast: false
