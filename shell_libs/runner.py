@@ -1,10 +1,13 @@
 #!/usr/bin/python3
 # -*- coding: UTF-8 -*-
+import os
+from pathlib import Path
 
 from shell_libs.process import Process
 
 import sys
 from shell_libs.color import Color
+from shell_libs.tools import Tools
 
 
 class Runner(object):
@@ -37,15 +40,20 @@ class Runner(object):
             },
         ]
         missing_required = False
+        p = platform.system().lower()
 
         for app in required_apps:
             name = app.get("name", None)
             if name is not None and name.strip() != '':
+
+                if p == 'windows' and name == 'gcc' and not Process.exists(name):
+                    Runner.get_gcc()
+
                 if not Process.exists(name):
+
                     missing_required = True
                     Color.pl('{!} {R}error: required app {O}%s{R} was not found' % name)
 
-                    p = platform.system().lower()
                     txt = app.get(p, "")
                     if txt is not None and txt.strip() != '':
                         Color.pl('{?} {O}Instructions to install dependency: ')
@@ -54,6 +62,29 @@ class Runner(object):
         if missing_required:
             Color.pl('{!} {R}required app(s) were not found, exiting.{W}')
             sys.exit(-1)
+
+    @staticmethod
+    def get_gcc():
+        return
+
+        import requests
+        requests.packages.urllib3.disable_warnings()
+
+        Color.pl('{+} {GR}GCC not found, trying to get mingw-w64 gcc.{W}')
+        try:
+            r = requests.get('https://github.com/helviojunior/shellcodetester/blob/master/resources/mingw64_8.1.zip',
+                             allow_redirects=True, verify=False, timeout=30)
+
+            bin_path = os.path.join(Path(os.path.dirname(__file__)).resolve().parent, 'shell_bins', 'windows')
+            with open(os.path.join(bin_path, 'mingw64.zip'), 'wb') as f:
+                f.write(r.content)
+
+            from zipfile import ZipFile
+            with ZipFile(os.path.join(bin_path, 'mingw64.zip'), 'r') as zObject:
+                zObject.extractall(path=bin_path)
+
+        except Exception as e:
+            Tools.print_error(e)
 
     def run(self):
         pass

@@ -1,3 +1,4 @@
 colorama
 tabulate>=0.8.10
 pathlib>=1.0.1
+requests>=2.23.0
