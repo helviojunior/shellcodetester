@@ -43,17 +43,41 @@ jobs:
       - name: Install dependencies
         uses: awalsh128/cache-apt-pkgs-action@latest
         with:
-          packages: wget
+          packages: wget jq zip unzip curl ca-certificates libgmp-dev libmpc-dev libmpfr-dev libisl-dev xz-utils texinf patch p7zip cmake make m4 gcc g++
           version: 1.0
 
       - name: Download last release
+        id: download
         run: |
-          wget -O /tmp/mingw-latest.zip https://github.com/helviojunior/shellcodetester/releases/download/v0.2.3/mingw-latest.zip
+          url=$(curl -s https://api.github.com/repos/helviojunior/shellcodetester/releases/latest | jq -r '.assets[] | select(.name|match("mingw-latest.zip$")) | .browser_download_url')
+          wget -O /tmp/mingw-latest.zip $url
+          echo "::set-output name=DOWNLOAD_URL::${url}"
 
       - uses: actions/upload-artifact@v2
+        if:
+          steps.download.outputs.DOWNLOAD_URL != ''
         with:
           name: mingw-latest.zip
           path: /tmp/mingw-latest.zip
+          retention-days: 3
+
+      - name: checkout
+        if:
+          steps.download.outputs.DOWNLOAD_URL == ''
+        uses: actions/checkout@v2
+
+      - name: Build 64-bit
+        if:
+          steps.download.outputs.DOWNLOAD_URL == ''
+        id: build64
+        run: chmod +x ./resources/build.sh && ./resources/build.sh 64
+
+      - uses: actions/upload-artifact@v2
+        if:
+          steps.download.outputs.DOWNLOAD_URL == ''
+        with:
+          name: mingw-latest.zip
+          path: ./${{ steps.build64.outputs.OUTPUT_BINARY }}
           retention-days: 3
 
   binutils_macosx:
