@@ -44,7 +44,7 @@ class Disassembler(AsmFile):
 
     def dump(self, bad_chars: [bytearray, bytes] = bytearray(), quiet: bool = False):
         if not quiet:
-            Logger.pl('{+} {W}Disassembly of {G}%s{W}' % self.o_file.name)
+            Logger.pl('{+} {W}Disassembly{W}')
 
         if self.platform == "darwin":
             cmd = f"objdump -D -Mintel,i386 \"{self.o_file.resolve()}\""

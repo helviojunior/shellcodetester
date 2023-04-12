@@ -70,6 +70,12 @@ class Arguments(object):
                             type=str,
                             help=Color.s('List of bad chars to highlight (ex: {G}\\x00\\x0a{W}, default: {G}\\0x00{W})'))
 
+        custom.add_argument('--remove',
+                            action='store_true',
+                            default=False,
+                            dest='remove',
+                            help=Color.s('Remove bad chars from final shellcode. (default: {G}false{W})'))
+
         custom.add_argument('--cave-size',
                             action='store',
                             dest='cave_size',

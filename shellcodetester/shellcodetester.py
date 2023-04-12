@@ -36,7 +36,7 @@ class ShellcodeTester(Runner):
         try:
 
             timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            Logger.pl('{+} {C}start time {O}%s{W}' % timestamp)
+            Logger.pl('{+} {C}Start time {O}%s{W}' % timestamp)
 
             # Assembly ASM File
             asm = Assembler(Configuration.asm_file)
@@ -47,9 +47,19 @@ class ShellcodeTester(Runner):
                 dis = Disassembler(Configuration.asm_file, asm.assembled_data)
                 dis.dump(Configuration.bad_chars)
 
+                fill_data = bytearray([
+                    b for b in asm.assembled_data
+                    if b not in Configuration.bad_chars
+                ])
+
+                if len(asm.assembled_data) != len(fill_data):
+                    Logger.pl('{!} {R}Bad chars found. {GR}Disassembly without bad chars{W}')
+                    dis = Disassembler(filename='', assembled_data=fill_data, platform=Configuration.platform, arch=asm.arch)
+                    dis.dump(Configuration.bad_chars, quiet=True)
+
             asm.print_payload(Configuration.transform_format, Configuration.bad_chars)
 
-            comp = Compiler(Configuration.asm_file, asm.assembled_data)
+            comp = Compiler(Configuration.asm_file, asm.assembled_data, Configuration.bad_chars, Configuration.remove)
             if not comp.compile():
                 sys.exit(2)
 

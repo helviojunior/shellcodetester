@@ -18,12 +18,19 @@ class Compiler(AsmFile):
     c_file = ''
     bin_file = ''
     assembled_data = None
+    bad_chars = None
+    remove_bad_chars = False
 
-    def __init__(self, filename: str, assembled_data: bytearray):
+    def __init__(self, filename: str,
+                 assembled_data: bytearray,
+                 bad_chars: [bytearray, bytes] = bytearray(),
+                 remove_bad_chars: bool = False):
         super().__init__(filename)
         self.assembled_data = assembled_data
         self.c_file = Path(f"{self.file_pattern}.c")
         self.bin_file = Path(f"{self.get_name()}")
+        self.bad_chars = bytearray([b for b in bad_chars])
+        self.remove_bad_chars = remove_bad_chars
 
     def get_name(self) -> str:
         import platform
@@ -151,7 +158,7 @@ class Compiler(AsmFile):
 
         Logger.debug("File compiled with {G}%s bytes" % stat.st_size)
 
-        if not self.replace_onfile(self.bin_file, pattern, self.assembled_data):
+        if not self.replace_on_file(self.bin_file, pattern, self.assembled_data, self.bad_chars, self.remove_bad_chars):
             Logger.pl('{!} {R}Error putting the shellcode inside of executable file {G}%s{W}' % self.bin_file.name)
             return False
 
@@ -169,7 +176,11 @@ class Compiler(AsmFile):
         Logger.pl('\n{+} {W}To run your shellcode execute the command: \n    {O}%s{W}\n' % self.bin_file.resolve())
         return True
 
-    def replace_onfile(self, filename: [str, Path], pattern: [bytearray, bytes], replace_to: [bytearray, bytes]) -> bool:
+    def replace_on_file(self, filename: [str, Path],
+                        pattern: [bytearray, bytes],
+                        replace_to: [bytearray, bytes],
+                        bad_chars: [bytearray, bytes] = bytearray(),
+                        remove_bad_chars: bool = False) -> bool:
         file = Path(filename)
         stat = self.bin_file.stat()
         if stat.st_size == 0:
@@ -189,9 +200,12 @@ class Compiler(AsmFile):
                 '{!} {R}Error putting the shellcode at {G}%s{R}:{O} %s{W}' % (file.name, 'replace_to data is greater than binary file'))
             return False
 
-        fill_data = bytearray(replace_to)
+        fill_data = bytearray([
+            b for b in replace_to
+            if not remove_bad_chars or b not in bad_chars
+        ])
 
-        for n in range(len(pattern) - len(replace_to)):
+        for n in range(len(pattern) - len(fill_data)):
             fill_data.append(0x90)
 
         new_data = bin_data[0:idx] + fill_data + bin_data[idx + len(pattern):]

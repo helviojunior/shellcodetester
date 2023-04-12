@@ -22,6 +22,7 @@ class Configuration(object):
     out_file = ''
     pwd = ''
     platform = ''
+    remove = False
     transform_format = 0
     breakpoint = False
     fill = False
@@ -121,6 +122,7 @@ class Configuration(object):
 
         Configuration.cave_size = int(args.cave_size)
         Configuration.breakpoint = args.breakpoint
+        Configuration.remove = args.remove
         Configuration.fill = args.fill
         Configuration.transform_format = Transform.parse_format(args.transform_format)
 
@@ -133,6 +135,9 @@ class Configuration(object):
             ])))
         else:
             Logger.pl('     {C}bad chars:{O} Empty{W}')
+            Configuration.remove = False
+
+        Logger.pl('     {C}remove bad chars:{O} %s{W}' % Configuration.remove)
 
         if not os.path.isfile(Configuration.asm_file):
             Color.pl('{!} {R}error: ASM file not found {O}%s{R}{W}\r\n' % Configuration.asm_file)
