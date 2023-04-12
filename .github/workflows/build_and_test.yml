@@ -209,15 +209,15 @@ jobs:
 
       - name: Copy binaries
         run: |
-          mkdir bin/linux/
-          mkdir bin/windows/
-          mkdir bin/macosx/
-          echo "" > bin/__init__.py
-          echo "" > bin/linux/__init__.py
-          echo "" > bin/windows/__init__.py
-          echo "" > bin/macosx/__init__.py
-          cp ${{steps.download.outputs.download-path}}/objdump_linux* bin/linux/objdump
-          cp ${{steps.download2.outputs.download-path}}/objdump_macosx* bin/macosx/objdump
+          mkdir shell_bins/linux/
+          mkdir shell_bins/windows/
+          mkdir shell_bins/macosx/
+          echo "" > shell_bins/__init__.py
+          echo "" > shell_bins/linux/__init__.py
+          echo "" > shell_bins/windows/__init__.py
+          echo "" > shell_bins/macosx/__init__.py
+          cp ${{steps.download.outputs.download-path}}/objdump_linux* shell_bins/linux/objdump
+          cp ${{steps.download2.outputs.download-path}}/objdump_macosx* shell_bins/macosx/objdump
 
       - name: Download nasm
         run: |
@@ -225,17 +225,17 @@ jobs:
           wget https://www.nasm.us/pub/nasm/releasebuilds/2.16.01/macosx/nasm-2.16.01-macosx.zip -O /tmp/nasm_mac.zip
           wget https://www.nasm.us/pub/nasm/releasebuilds/2.16.01/linux/nasm-2.16.01-0.fc36.x86_64.rpm -O /tmp/nasm_linux.rpm
           unzip -jo /tmp/nasm_win.zip -d /tmp/
-          cp /tmp/nasm.exe bin/windows/
+          cp /tmp/nasm.exe shell_bins/windows/
           unzip -jo /tmp/nasm_mac.zip -d /tmp/
-          cp /tmp/nasm bin/macosx/
+          cp /tmp/nasm shell_bins/macosx/
           rpm2cpio /tmp/nasm_linux.rpm | cpio -idmv -D /tmp/
-          cp /tmp/usr/bin/nasm bin/linux/
+          cp /tmp/usr/bin/nasm shell_bins/linux/
 
       - name: Download objdump
         run: |
           wget -O /tmp/binutils.tar.xz https://razaoinfo.dl.sourceforge.net/project/mingw/MinGW/Base/binutils/binutils-2.28/binutils-2.28-1-mingw32-bin.tar.xz
           tar xvf /tmp/binutils.tar.xz -C /tmp/
-          cp /tmp/bin/objdump.exe bin/windows/objdump.exe
+          cp /tmp/bin/objdump.exe shell_bins/windows/objdump.exe
 
       - name: Install Python dependencies
         run: |

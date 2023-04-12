@@ -72,10 +72,9 @@ class Process(object):
         if p == 'darwin':
             p = 'macosx'
 
-        bin_path = Path(os.path.dirname(__file__) + f'../bin/{p}')
+        bin_path = Path(os.path.dirname(__file__) + f'../shell_bins/{p}')
         my_env = os.environ.copy()
-        return f"{bin_path}:" + my_env["PATH"]
-
+        return my_env["PATH"] + f":{bin_path}"
 
     @staticmethod
     def exists(program):

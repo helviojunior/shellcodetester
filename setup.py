@@ -46,7 +46,7 @@ package_data.update(
         dp.replace(here.strip('/') + '/', '').lstrip('/. ').replace('\\', '/').replace('/', '.'): [
             f for f in filenames if '.py' not in f.lower() and '.ds_store' not in f.lower()
         ]
-        for dp, dn, filenames in os.walk(f"{here}/bin") for f in filenames
+        for dp, dn, filenames in os.walk(f"{here}/shell_bins") for f in filenames
         if '.py' not in f.lower() and '.ds_store' not in f.lower()
     }
 )
