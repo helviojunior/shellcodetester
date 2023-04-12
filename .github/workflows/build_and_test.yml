@@ -110,16 +110,8 @@ jobs:
 
       - uses: actions/upload-artifact@v2
         with:
-          name: mingw-latest.zip
-          path: $GITHUB_WORKSPACE/mingw-latest.zip
-          content_type: application/zip
-          retention-days: 3
-
-      - uses: actions/upload-artifact@v2
-        with:
           name: binutils.zip
           path: $GITHUB_WORKSPACE/binutils.zip
-          content_type: application/zip
           retention-days: 3
 
   publish:
