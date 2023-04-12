@@ -56,7 +56,7 @@ class Arguments(object):
                           metavar='[architecture]',
                           default='x86',
                           type=str,
-                          help=Color.s('Architecture to assembly/disassembly. (default: {G}x86{W})'))
+                          help=Color.s('Architecture to assembly/disassembly. (default: {G}x86{W}, permitted:x86_64, x86)'))
 
         glob.add_argument('--platform',
                           action='store',

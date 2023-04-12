@@ -27,6 +27,9 @@ class InlineAssembler(AsmFile):
             f.write("section .text\n")
             f.write("_start:\n")
 
+            if isinstance(instructions, str) and ';' in instructions:
+                instructions = instructions.split(';')
+
             if isinstance(instructions, list):
                 f.write('\n'.join(instructions))
             else:
