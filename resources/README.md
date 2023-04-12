@@ -1,3 +1,4 @@
+
 Automatic 32-bit and 64-bit Windows build of [gcc][] compiler, [mingw-w64][] runtime, [gdb][] debugger and [make][].
 
 Builds are linked statically to their dependencies and provide only static runtime libraries (libstdc++, libgomp, libwinpthread and others).

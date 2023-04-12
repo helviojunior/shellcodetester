@@ -75,7 +75,7 @@ class Process(object):
         bin_path = os.path.join(Path(os.path.dirname(__file__)).resolve().parent, 'shell_bins', p)
         my_env = os.environ.copy()
         if p == 'windows':
-            mingw64_path = os.path.join(Path(os.path.dirname(__file__)).resolve().parent, 'shell_bins', p, 'mingw64')
+            mingw64_path = os.path.join(Path(os.path.dirname(__file__)).resolve().parent, 'shell_bins', p, 'mingw64', 'bin')
             return f"{bin_path};{mingw64_path};" + my_env["PATH"]
         else:
             return my_env["PATH"] + f":{bin_path}"

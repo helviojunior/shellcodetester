@@ -22,11 +22,13 @@ if [ "${ARG}" == "32" ]; then
   TARGET=i686-w64-mingw32
   EXTRA_CRT_ARGS=--disable-lib64
   EXTRA_GCC_ARGS="--disable-sjlj-exceptions --with-dwarf2"
+  FINAL_NAME=mingw
 elif [ "${ARG}" == "64" ]; then
   NAME=gcc-v${GCC_VERSION}-mingw-v${MINGW_VERSION}-x86_64
   TARGET=x86_64-w64-mingw32
   EXTRA_CRT_ARGS=--disable-lib32
   EXTRA_GCC_ARGS=
+  FINAL_NAME=mingw64
 else
   exit 1
 fi
@@ -72,6 +74,9 @@ PREFIX=`pwd`/prefix/${TARGET}
 
 # final installation folder
 FINAL=`pwd`/${NAME}
+
+# zip folder
+ZIP=`pwd`/release/
 
 get https://github.com/facebook/zstd/releases/download/v${ZSTD_VERSION}/zstd-${ZSTD_VERSION}.tar.gz
 get https://ftp.gnu.org/gnu/gmp/gmp-${GMP_VERSION}.tar.xz
@@ -328,11 +333,13 @@ find ${FINAL} -name '*.o'   -print0 | xargs -0 -n 8 -P 2 ${TARGET}-strip --strip
 find ${FINAL} -name '*.a'   -print0 | xargs -0 -n 8 -P `nproc` ${TARGET}-strip --strip-unneeded
 
 rm ${FINAL}/mingw
-7zr a -mx9 -mqs=on -mmt=on ${OUTPUT}/${NAME}.7z ${FINAL}
+mkdir -p ${ZIP}/${FINAL_NAME}
+rsync -av ${FINAL}/* ${ZIP}/${FINAL_NAME}
+zip -r -9 ${OUTPUT}/mingw-latest.zip ${ZIP}
 
 if [[ -v GITHUB_WORKFLOW ]]; then
   echo "::set-output name=GCC_VERSION::${GCC_VERSION}"
   echo "::set-output name=MINGW_VERSION::${MINGW_VERSION}"
-  echo "::set-output name=OUTPUT_BINARY::${NAME}.7z"
+  echo "::set-output name=OUTPUT_BINARY::mingw-latest.zip"
   echo "::set-output name=RELEASE_NAME::gcc-v${GCC_VERSION}-mingw-v${MINGW_VERSION}"
 fi
