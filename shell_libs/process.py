@@ -72,7 +72,7 @@ class Process(object):
         if p == 'darwin':
             p = 'macosx'
 
-        bin_path = Path(os.path.dirname(__file__) + f'../shell_bins/{p}')
+        bin_path = os.path.join(Path(os.path.dirname(__file__)).resolve().parent, 'shell_bins', p)
         my_env = os.environ.copy()
         if p == 'windows':
             return f"{bin_path};" + my_env["PATH"]
