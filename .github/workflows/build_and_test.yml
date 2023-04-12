@@ -168,7 +168,7 @@ jobs:
 
   publish:
     name: Publish on Test Environment
-    needs: binutils_linux, binutils_macosx
+    needs: [binutils_linux, binutils_macosx]
     runs-on: ubuntu-latest
     if:
       github.event_name == 'push' || github.event.pull_request.head.repo.full_name !=
