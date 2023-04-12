@@ -48,7 +48,7 @@ class Arguments(object):
                           metavar='[mode]',
                           default='assembly',
                           type=str,
-                          help=Color.s('Operation mode. (default: assembly, permitted: assembly and disassembly)'))
+                          help=Color.s('Operation mode. (default: {G}assembly{W}, permitted: {G}assembly{W} and {G}disassembly{W})'))
 
         glob.add_argument('--arch',
                           action='store',
@@ -56,14 +56,14 @@ class Arguments(object):
                           metavar='[architecture]',
                           default='x86',
                           type=str,
-                          help=Color.s('Architecture to assembly/disassembly. (default: {G}x86{W}, permitted:x86_64, x86)'))
+                          help=Color.s('Architecture to assembly/disassembly. (default: {G}x86{W}, permitted: {G}x86_64{W} and {G}x86{W})'))
 
         glob.add_argument('--platform',
                           action='store',
                           dest='platform',
                           metavar='[platform]',
                           type=str,
-                          help=Color.s('Platform. (permitted: {G}linux{W}, {G}windows{W} and {G}darwin{W}'))
+                          help=Color.s('Platform. (permitted: {G}linux{W}, {G}windows{W} and {G}darwin{W})'))
 
     def _add_custom_args(self, custom):
         custom.add_argument('--bad-chars',
@@ -94,7 +94,7 @@ class Arguments(object):
                             default=0,
                             dest='verbose',
                             help=Color.s(
-                                'Shows more options ({C}-h -v{W}). Prints commands and outputs. (default: {G}quiet{W})'))
+                                'Shows more options ({G}-h -v{W}). Prints commands and outputs. (default: {G}quiet{W})'))
 
         custom.add_argument('-q',
                             '--quiet',

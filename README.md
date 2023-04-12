@@ -16,9 +16,10 @@ ShellcodeTester officially supports Python 3.8+.
 * [x] Assembly ASM file to Windows, Linux and MacOS
 * [x] Check badchars
 * [x] Output to several formats
+* [x] NASM Shell
 * [x] Other amazing features...
 
-## Getting stats
+## Shellcode Tester - Getting stats
 
 ```bash
 shellcodetester -asm file.asm
@@ -49,6 +50,71 @@ https://github.com/helviojunior/shellcodetester
 
 ```
 
+## Nasm Shell - Getting stats
+
+### Assembling
+
+```bash
+$ nasm_shell
+┌─[NASM Shell]─[x86 linux]─[ASM → Hex]
+└──╼➤ push eax
+[+] Payload size: 1 bytes
+[+] Final size of RAW data: 2 bytes
+50
+
+[+] Disassembly
+   0:	50                   	push   eax
+
+┌─[NASM Shell]─[x86 linux]─[ASM → Hex]
+└──╼➤ push eax ; retn 4
+[+] Payload size: 4 bytes
+[+] Final size of RAW data: 8 bytes
+50c20400
+
+[+] Disassembly
+   0:	50                   	push   eax
+   1:	c2 04 00             	ret    0x4
+```
+
+### Disassembling
+
+```bash
+$ nasm_shell --mode dis
+┌─[NASM Shell]─[x86 linux]─[Hex → ASM]
+└──╼➤ 50ff501c
+[+] Payload size: 4 bytes
+[+] Final size of RAW data: 8 bytes
+50ff501c
+
+[+] Disassembly
+   0:	50                   	push   eax
+   1:	ff 50 1c             	call   DWORD PTR [eax+0x1c]
+```
+
+### 64 bits (x86-64)
+
+```bash
+$ nasm_shell --arch x86_64
+┌─[NASM Shell]─[x86_64 linux]─[ASM → Hex]
+└──╼➤ push rax
+[+] Payload size: 1 bytes
+[+] Final size of RAW data: 2 bytes
+50
+
+[+] Disassembly
+   0:	50                   	push   rax
+
+┌─[NASM Shell]─[x86_64 linux]─[ASM → Hex]
+└──╼➤ push rax ; push rbx
+[+] Payload size: 2 bytes
+[+] Final size of RAW data: 4 bytes
+5053
+
+[+] Disassembly
+   0:	50                   	push   rax
+   1:	53                   	push   rbx
+```
+
 ## Installation
 
 ```bash
@@ -56,6 +122,8 @@ pip3 install --upgrade shellcodetester
 ```
 
 # Help
+
+## Shellcodetester
 
 ```bash
 $ shellcodetester -h
@@ -78,6 +146,26 @@ Custom Settings:
   --list                          List all supported output format
   -f [format], --format [format]  Output format (use --list formats to list)
   -v, --verbose                   Shows more options (-h -v). Prints commands and outputs. (default: quiet)
+```
+
+## Nasmshell
+
+```bash
+$ nasm_shell -h
+options:
+  -h, --help                      show this help message and exit
+
+General Setting:
+  --mode [mode]                   Operation mode. (default: assembly, permitted: assembly and disassembly)
+  --arch [architecture]           Architecture to assembly/disassembly. (default: x86, permitted: x86_64 and x86)
+  --platform [platform]           Platform. (permitted: linux, windows and darwin)
+
+Custom Settings:
+  --bad-chars [bad char list]     List of bad chars to highlight (ex: \x00\x0a, default: \0x00)
+  --list                          List all supported output format
+  -f [format], --format [format]  Output format (use --list formats to list)
+  -v, --verbose                   Shows more options (-h -v). Prints commands and outputs. (default: quiet)
+  -q, --quiet                     Quiet mode, not show banners. (default: false)
 ```
 
 # Windows Users
