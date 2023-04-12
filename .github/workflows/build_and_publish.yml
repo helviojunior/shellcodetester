@@ -240,6 +240,7 @@ jobs:
           upload_url: ${{ github.event.release.upload_url }}
           asset_path: /tmp/binutils.zip
           asset_name: binutils.zip
+          overwrite: true
           asset_content_type: application/zip
 
       - name: Upload mingw64 release asset
@@ -251,6 +252,7 @@ jobs:
           upload_url: ${{ github.event.release.upload_url }}
           asset_path: /tmp/mingw-latest.zip
           asset_name: mingw-latest.zip
+          overwrite: true
           asset_content_type: application/zip
 
   publish:
