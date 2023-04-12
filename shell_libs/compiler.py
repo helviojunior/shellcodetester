@@ -50,17 +50,34 @@ class Compiler(AsmFile):
                 f.write('#include<stdio.h>\n')
                 f.write('#include<string.h>\n')
                 f.write('\n')
-                f.write('void shell();\n')
+                f.write('char ZEROARRAY[1024] = {0};\n')
                 f.write('\n')
-                f.write('void main() {\n')
+                f.write('void shell(int*, int*);\n')
+                f.write('void code_cave();\n')
+                f.write('\n')
+                f.write('int main() {\n')
                 f.write('\n')
                 f.write(f'    int size = {len(self.assembled_data)};\n')
-                f.write('    printf("Shellcode Length:  %d\\n", size);\n')
+                f.write('    size_t size2 = sizeof(ZEROARRAY);\n')
+                f.write('    printf("Shellcode Length: %d\\n", size);\n')
+
+                if self.arch == 'x86':
+                    f.write('    printf("edi = %p => code cave\\n", &code_cave);\n')
+                    f.write('    printf("esi = %p => writable memory (%zd bytes)\\n", &ZEROARRAY, size2);\n')
+                elif self.arch == 'x86_64':
+                    f.write('    printf("rdi = %p => code cave\\n", &code_cave);\n')
+                    f.write('    printf("rsi = %p => writable memory (%zd bytes)\\n", &ZEROARRAY, size2);\n')
+
                 f.write('\n')
-                f.write('    shell();\n')
+                f.write('    shell(&code_cave, &ZEROARRAY);\n')
+                f.write('    return 0;\n')
                 f.write('}\n')
                 f.write('\n')
-                f.write('void shell() {\n')
+                f.write('void shell(int *code_cave, int *data) {\n')
+
+                if self.arch == 'x86':
+                    f.write('    asm("mov 0x8(%esp),%edi");\n')
+                    f.write('    asm("mov 0xc(%esp),%esi");\n')
 
                 if Configuration.breakpoint:
                     f.write('    asm("INT3"); // INT3 -> Breakpoint\n')
@@ -85,6 +102,14 @@ class Compiler(AsmFile):
                         f.write('    asm("NOP");\n')
 
                 f.write('}\n')
+                f.write('\n')
+
+                f.write('void code_cave() {\n')
+
+                for n in range(Configuration.cave_size):
+                    f.write('    asm("NOP");\n')
+
+                f.write('}\n')
                 pass
 
         except IOError as x:
@@ -105,8 +130,8 @@ class Compiler(AsmFile):
             self.bin_file.unlink(missing_ok=True)
 
         gcc_flags = '-fno-stack-protector'
-        if not Tools.is_platform_windows():
-            gcc_flags = ' -z execstack'
+        #if not Tools.is_platform_windows():
+        #    gcc_flags = ' -z execstack'
         if self.arch == 'x86':
             gcc_flags += ' -m32'
 
@@ -114,6 +139,9 @@ class Compiler(AsmFile):
         (code, out, err) = Process.call(f"gcc \"{self.c_file.resolve()}\" -o \"{self.bin_file.resolve()}\" {gcc_flags}")
         if code != 0:
             Logger.pl('{!} {R}Error assembling {G}%s{R}:{O} \n{W}%s{W}' % (self.file_path.name, err))
+            if 'stdio.h' in err and 'file not found' in err and Configuration.platform == 'macos':
+                Logger.pl(('{R}NOTE: {GR}Try to run the following command before execute the shellcode tester: '
+                           '{G}export SDKROOT=$(xcrun --sdk macosx --show-sdk-path){W}\n'))
             return False
 
         stat = self.bin_file.stat()
@@ -130,17 +158,15 @@ class Compiler(AsmFile):
         if Tools.is_platform_windows():
             if Configuration.breakpoint:
                 Logger.pl(
-                    '\n{+} {W}To debug your shellcode open the following application in your debugger: \n     {O}%s{W}\n' % self.bin_file.resolve())
+                    '\n{+} {W}To debug your shellcode open the following application in your debugger: \n    {O}%s{W}\n' % self.bin_file.resolve())
                 return True
-
-            Logger.pl('\n{+} {W}To run your shellcode execute the application: \n     {O}%s{W}\n' % self.bin_file.resolve())
         else:
             if Configuration.breakpoint:
                 Logger.pl(
-                    '\n{+} {W}To debug your shellcode execute the command: \n     {O}gdb -q %s{W}\n' % self.bin_file.resolve())
+                    '\n{+} {W}To debug your shellcode execute the command: \n    {O}gdb -q %s{W}\n' % self.bin_file.resolve())
                 return True
 
-            Logger.pl('\n{+} {W}To execute your shellcode execute the command: \n     {O}%s{W}\n' % self.bin_file.resolve())
+        Logger.pl('\n{+} {W}To run your shellcode execute the command: \n    {O}%s{W}\n' % self.bin_file.resolve())
         return True
 
     def replace_onfile(self, filename: [str, Path], pattern: [bytearray, bytes], replace_to: [bytearray, bytes]) -> bool:

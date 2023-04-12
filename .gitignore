@@ -52,3 +52,7 @@ dist
 
 # Reinclude all Resources Path
 !resources/*
+
+# Compiled files #
+###################
+st_*

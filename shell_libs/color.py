@@ -18,19 +18,17 @@ class Color(object):
         'B' : '\033[34m', # blue
         'P' : '\033[35m', # purple
         'C' : '\033[36m', # cyan
-        'GR': '\033[37m', # gray
+        'GR': '\033[38;5;247m', # gray
         'D' : '\033[2m'   # dims current color. {W} resets.
     }
 
     # Helper string replacements
     replacements = {
-        '{+}': ' {W}{D}[{W}{G}+{W}{D}]{W}',
-        '{!}': ' {O}[{R}!{O}]{W}',
-        '{?}': ' {W}{D}[{W}{C}?{W}{D}]{W}',
-        '{*}': ' {W}{D}[{W}{B}*{W}{D}]{W}',
+        '{+}': '{W}{D}[{W}{G}+{W}{D}]{W}',
+        '{!}': '{O}[{R}!{O}]{W}',
+        '{?}': '{W}{D}[{W}{C}?{W}{D}]{W}',
+        '{*}': '{W}{D}[{W}{B}*{W}{D}]{W}',
     }
-
-
 
     last_sameline_length = 0
 

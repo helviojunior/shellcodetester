@@ -21,10 +21,12 @@ class Configuration(object):
     asm_file = ''
     out_file = ''
     pwd = ''
+    platform = ''
     transform_format = 0
     breakpoint = False
     fill = False
     bad_chars = bytearray([0x00])
+    cave_size = 200
 
     @staticmethod
     def initialize():
@@ -54,6 +56,11 @@ class Configuration(object):
     def load_from_arguments():
         ''' Sets configuration values based on Argument.args object '''
         from .args import Arguments
+        import platform
+        p = platform.system().lower()
+        if p == 'darwin':
+            p = 'macos'
+        Configuration.platform = p
 
         config_check = 0
 
@@ -94,6 +101,7 @@ class Configuration(object):
 
         Color.pl('{+} {W}Startup parameters')
         Logger.pl('     {C}command line:{O} %s{W}' % Configuration.cmd_line)
+        Logger.pl('     {C}platform:{O} %s{W}' % Configuration.platform)
 
         if Configuration.verbose > 0:
             Logger.setLevel(Configuration.verbose)
