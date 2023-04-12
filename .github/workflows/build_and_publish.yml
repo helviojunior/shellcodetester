@@ -43,7 +43,7 @@ jobs:
       - name: Install dependencies
         uses: awalsh128/cache-apt-pkgs-action@latest
         with:
-          packages: wget jq zip unzip curl ca-certificates libgmp-dev libmpc-dev libmpfr-dev libisl-dev xz-utils texinf patch p7zip cmake make m4 gcc g++
+          packages: wget jq zip unzip curl ca-certificates libgmp-dev libmpc-dev libmpfr-dev libisl-dev xz-utils texinfo patch p7zip cmake make m4 gcc g++
           version: 1.0
 
       - name: Download last release
