@@ -128,7 +128,7 @@ pip3 install --upgrade shellcodetester
 ```bash
 $ shellcodetester -h
 
-ShellcodeTester v0.2.2 by Helvio Junior (M4v3r1ck)
+ShellcodeTester v0.X.X by Helvio Junior (M4v3r1ck)
 ShellcodeTester is a tool to assembly, compile and test ASM shellcode.
 https://github.com/helviojunior/shellcodetester
 
@@ -142,6 +142,7 @@ General Setting:
 Custom Settings:
   --break-point                   Set software breakpoint (INT3) before shellcode (default: false)
   --bad-chars [bad char list]     List of bad chars to highlight (ex: \x00\x0a, default: \0x00)
+  --remove                        Remove bad chars from final binary executable (EXE, ELF and Mach-O). (default: false)
   --cave-size [size]              Code cave size (default: 1024)
   --fill-with-nop                 Fill entire page with NOP (default: false)
   --list                          List all supported output format

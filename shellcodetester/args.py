@@ -74,7 +74,7 @@ class Arguments(object):
                             action='store_true',
                             default=False,
                             dest='remove',
-                            help=Color.s('Remove bad chars from final shellcode. (default: {G}false{W})'))
+                            help=Color.s('Remove bad chars from final binary executable (EXE, ELF and Mach-O). (default: {G}false{W})'))
 
         custom.add_argument('--cave-size',
                             action='store',
