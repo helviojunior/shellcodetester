@@ -105,13 +105,13 @@ jobs:
 
       - name: Download last release
         run: |
-          wget -O $GITHUB_WORKSPACE/mingw-latest.zip https://github.com/helviojunior/shellcodetester/releases/latest/download/mingw-latest.zip
-          wget -O $GITHUB_WORKSPACE/binutils.zip https://github.com/helviojunior/shellcodetester/releases/latest/download/binutils.zip
+          wget -O /tmp/mingw-latest.zip https://github.com/helviojunior/shellcodetester/releases/latest/download/mingw-latest.zip
+          wget -O /tmp/binutils.zip https://github.com/helviojunior/shellcodetester/releases/latest/download/binutils.zip
 
       - uses: actions/upload-artifact@v2
         with:
           name: binutils.zip
-          path: ${{ GITHUB_WORKSPACE }}/binutils.zip
+          path: /tmp/binutils.zip
           retention-days: 3
 
   publish:
