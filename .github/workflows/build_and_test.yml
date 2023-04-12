@@ -39,9 +39,39 @@ jobs:
         run: |
           flake8 . --count --ignore=E1,E2,E3,E501,W291,W293 --exit-zero --max-complexity=65 --max-line-length=127 --statistics
 
+  binutils_macosx:
+    name: Build macosx binaries
+    needs: lint
+    runs-on: macos-latest
+    if:
+      github.event_name == 'push' || github.event.pull_request.head.repo.full_name !=
+      github.repository
+    env:
+      bin_version: '2.40'
+      bin_platform: 'x86_64-pc-darwin'
+
+    strategy:
+      fail-fast: false
+
+    steps:
+      - name: Install Homebrew
+        run: |
+          NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+          brew install binutils
+
+      - name: Build binutils
+        run: |
+          cp $(which objdump) ${{ github.workspace }}/objdump_macosx
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: objdump_macosx
+          path: ${{ github.workspace }}/objdump_macosx
+          retention-days: 3
+
   test:
     name: Run unit tests and build wheel
-    needs: lint
+    needs: binutils_macosx
     runs-on: ${{ matrix.os }}
     if:
       github.event_name == 'push' || github.event.pull_request.head.repo.full_name !=
@@ -166,11 +196,18 @@ jobs:
           packages: rpm2cpio wget
           version: 1.0
 
-      - name: Download arfactory
+      - name: Download arfactory (linux)
         uses: actions/download-artifact@v3
         id: download
         with:
           name: objdump_linux
+          path: /tmp/
+
+      - name: Download arfactory (MacOS)
+        uses: actions/download-artifact@v3
+        id: download2
+        with:
+          name: objdump_macosx
           path: /tmp/
 
       - name: Copy binaries
@@ -179,6 +216,7 @@ jobs:
           mkdir bin/windows/
           mkdir bin/macosx/
           cp ${{steps.download.outputs.download-path}}/objdump_linux* bin/linux/objdump
+          cp ${{steps.download2.outputs.download-path}}/objdump_macosx* bin/macosx/objdump
 
       - name: Download nasm
         run: |
