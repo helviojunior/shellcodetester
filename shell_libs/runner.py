@@ -65,14 +65,12 @@ class Runner(object):
 
     @staticmethod
     def get_gcc():
-        return
-
         import requests
         requests.packages.urllib3.disable_warnings()
 
         Color.pl('{+} {GR}GCC not found, trying to get mingw-w64 gcc.{W}')
         try:
-            r = requests.get('https://github.com/helviojunior/shellcodetester/blob/master/resources/mingw64_8.1.zip',
+            r = requests.get('https://github.com/helviojunior/shellcodetester/releases/latest/download/mingw-latest.zip',
                              allow_redirects=True, verify=False, timeout=30)
 
             bin_path = os.path.join(Path(os.path.dirname(__file__)).resolve().parent, 'shell_bins', 'windows')
@@ -82,6 +80,11 @@ class Runner(object):
             from zipfile import ZipFile
             with ZipFile(os.path.join(bin_path, 'mingw64.zip'), 'r') as zObject:
                 zObject.extractall(path=bin_path)
+
+            try:
+                os.unlink(os.path.join(bin_path, 'mingw64.zip'))
+            except:
+                pass
 
         except Exception as e:
             Tools.print_error(e)
