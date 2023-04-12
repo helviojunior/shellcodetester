@@ -34,13 +34,16 @@ jobs:
         run: |
           flake8 . --count --ignore=E1,E2,E3,E501,W291,W293 --exit-zero --max-complexity=65 --max-line-length=127 --statistics
 
-  binutils:
+  binutils_linux:
     name: Build Binutils Linux
     needs: lint
     runs-on: ubuntu-latest
     if:
       github.event_name == 'push' || github.event.pull_request.head.repo.full_name !=
       github.repository
+    env:
+      bin_version: '2.40'
+      bin_platform: 'x86_64-pc-linux-gnu'
 
     strategy:
       fail-fast: false
@@ -52,29 +55,36 @@ jobs:
           version: latest
           platform: x64
 
-      - name: Install Python dependencies
-        run: |
-          apt install -y texinfo flex bison libgmp-dev libmpfr-dev make wget
+      - name: Install dependencies
+        uses: awalsh128/cache-apt-pkgs-action@latest
         with:
-          version: '2.40'
-          platform: 'x86_64-pc-linux-gnu'
+          packages: texinfo flex bison libgmp-dev libmpfr-dev make wget
+          version: 1.0
 
       - name: Download binutils
         run: |
-          wget http://ftp.gnu.org/gnu/binutils/binutils-$version.tar.gz
-          tar xzf binutils-$version.tar.gz
+          mkdir $GITHUB_WORKSPACE/build/
+          cd $GITHUB_WORKSPACE/build/
+          wget http://ftp.gnu.org/gnu/binutils/binutils-$bin_version.tar.gz
+          tar xzf binutils-$bin_version.tar.gz
 
       - name: Build binutils
         run: |
-          cd binutils-$version
-          CC=gcc ./configure --target=$platform --disable-nls
+          cd $GITHUB_WORKSPACE/build/binutils-$bin_version
+          CC=gcc ./configure --target=$bin_platform --disable-nls
           make configure-host
           make LDFLAGS="-all-static"
-          ./binutils/objdump --version
+          cp ./binutils/objdump ${{ github.workspace }}/objdump_linux
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: objdump_linux
+          path: ${{ github.workspace }}/objdump_linux
+          retention-days: 3
 
   build:
     name: Build
-    needs: binutils
+    needs: binutils_linux
     runs-on: ubuntu-latest
     if:
       github.event_name == 'push' || github.event.pull_request.head.repo.full_name !=
