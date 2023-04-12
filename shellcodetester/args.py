@@ -61,7 +61,7 @@ class Arguments(object):
                             action='store_true',
                             default=False,
                             dest='breakpoint',
-                            help=Color.s('Set software breakpoint ({C}INT3{W}) before shellcode (default: {G}false{W})'))
+                            help=Color.s('Set software breakpoint ({G}INT3{W}) before shellcode (default: {G}false{W})'))
 
         custom.add_argument('--bad-chars',
                             action='store',
@@ -105,6 +105,6 @@ class Arguments(object):
                             default=0,
                             dest='verbose',
                             help=Color.s(
-                                'Shows more options ({C}-h -v{W}). Prints commands and outputs. (default: {G}quiet{W})'))
+                                'Shows more options ({G}-h -v{W}). Prints commands and outputs. (default: {G}quiet{W})'))
 
 
