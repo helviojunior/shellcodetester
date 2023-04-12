@@ -74,7 +74,10 @@ class Process(object):
 
         bin_path = Path(os.path.dirname(__file__) + f'../shell_bins/{p}')
         my_env = os.environ.copy()
-        return my_env["PATH"] + f":{bin_path}"
+        if p == 'windows':
+            return f"{bin_path};" + my_env["PATH"]
+        else:
+            return my_env["PATH"] + f":{bin_path}"
 
     @staticmethod
     def exists(program):
