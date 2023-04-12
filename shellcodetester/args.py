@@ -70,6 +70,14 @@ class Arguments(object):
                             type=str,
                             help=Color.s('List of bad chars to highlight (ex: {G}\\x00\\x0a{W}, default: {G}\\0x00{W})'))
 
+        custom.add_argument('--cave-size',
+                            action='store',
+                            dest='cave_size',
+                            metavar='[size]',
+                            type=int,
+                            default=1024,
+                            help=Color.s('Code cave size (default: {G}1024{W})'))
+
         custom.add_argument('--fill-with-nop',
                             action='store_true',
                             default=False,

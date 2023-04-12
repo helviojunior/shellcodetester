@@ -119,10 +119,12 @@ class Configuration(object):
         if args.out_file:
             Configuration.out_file = args.out_file
 
+        Configuration.cave_size = int(args.cave_size)
         Configuration.breakpoint = args.breakpoint
         Configuration.fill = args.fill
         Configuration.transform_format = Transform.parse_format(args.transform_format)
 
+        Logger.pl('     {C}code cave size:{O} %s{W}' % Configuration.cave_size)
         Logger.pl('     {C}transform format:{O} %s{W}' % (Transform.get_name(Configuration.transform_format)))
 
         if len(Configuration.bad_chars) > 0:
