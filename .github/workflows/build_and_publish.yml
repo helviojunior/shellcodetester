@@ -57,7 +57,6 @@ jobs:
           steps.download.outputs.DOWNLOAD_URL != ''
         run: |
           wget -O /tmp/mingw-latest.zip "${{ steps.download.outputs.DOWNLOAD_URL }}"
-          echo "::set-output name=DOWNLOAD_URL::${url}"
 
       - uses: actions/upload-artifact@v2
         if:
