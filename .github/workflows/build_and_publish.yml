@@ -46,11 +46,18 @@ jobs:
           packages: wget jq zip unzip curl ca-certificates libgmp-dev libmpc-dev libmpfr-dev libisl-dev xz-utils texinfo patch p7zip cmake make m4 gcc g++
           version: 1.0
 
-      - name: Download last release
+      - name: Get last release files
         id: download
         run: |
           url=$(curl -s https://api.github.com/repos/helviojunior/shellcodetester/releases/latest | jq -r '.assets[] | select(.name|match("mingw-latest.zip$")) | .browser_download_url')
           wget -O /tmp/mingw-latest.zip $url
+          echo "::set-output name=DOWNLOAD_URL::${url}"
+
+      - name: Download last release
+        if:
+          steps.download.outputs.DOWNLOAD_URL != ''
+        run: |
+          wget -O /tmp/mingw-latest.zip "${{ steps.download.outputs.DOWNLOAD_URL }}"
           echo "::set-output name=DOWNLOAD_URL::${url}"
 
       - uses: actions/upload-artifact@v2
