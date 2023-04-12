@@ -88,6 +88,54 @@ jobs:
         run: |
           python setup.py sdist
 
+  build_windows:
+    name: Build windows binaries
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: checkout
+        uses: actions/checkout@v2
+
+      - name: install dependencies
+        run: |
+          sudo apt-get install --no-install-recommends -y \
+            ca-certificates \
+            libgmp-dev      \
+            libmpc-dev      \
+            libmpfr-dev     \
+            libisl-dev      \
+            xz-utils        \
+            texinfo         \
+            patch           \
+            p7zip           \
+            cmake           \
+            make            \
+            curl            \
+            m4              \
+            gcc             \
+            g++
+
+      - name: build 64-bit
+        id: build64
+        run: ./resources/build.sh 64
+
+      - name: set file
+        run: echo "${{ steps.build64.outputs.OUTPUT_BINARY }}" > /tmp/windows_artifact.txt
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: windows_artifact.txt
+          path: /tmp/windows_artifact.txt
+          retention-days: 3
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: ${{ steps.build64.outputs.OUTPUT_BINARY }}
+          path: ./${{ steps.build64.outputs.OUTPUT_BINARY }}
+          content_type: application/x-7z-compressed
+          retention-days: 3
+
   binutils_macosx:
     name: Build macosx binaries
     needs: test
@@ -165,7 +213,7 @@ jobs:
 
   publish:
     name: Publish on Test Environment
-    needs: [binutils_linux, binutils_macosx]
+    needs: [binutils_linux, binutils_macosx, build_windows]
     runs-on: ubuntu-latest
     if:
       github.event_name == 'push' || github.event.pull_request.head.repo.full_name !=
@@ -231,10 +279,28 @@ jobs:
           rpm2cpio /tmp/nasm_linux.rpm | cpio -idmv -D /tmp/
           cp /tmp/usr/bin/nasm shell_bins/linux/
 
+      - name: Download arfactory (windows)
+        uses: actions/download-artifact@v3
+        with:
+          name: windows_artifact.txt
+          path: /tmp/
+
+      - name: Get mingw arfactory name
+        id: artname
+        run: |
+          NAME=$(cat /tmp/windows_artifact.txt)
+          echo "::set-output name=OUTPUT_BINARY::${NAME}"
+
+      - name: Download arfactory (windows)
+        uses: actions/download-artifact@v3
+        id: mingwbuild
+        with:
+          name: ${{ steps.artname.outputs.OUTPUT_BINARY }}
+          path: /tmp/
+
       - name: Download objdump
         run: |
-          wget -O /tmp/binutils.7z https://razaoinfo.dl.sourceforge.net/project/mingw-w64/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/8.1.0/threads-win32/seh/x86_64-8.1.0-release-win32-seh-rt_v6-rev0.7z
-          7z x binutils.7z -o/tmp/ *objdump.exe -r -aoa
+          7z x ${{steps.download.outputs.download-path}}/${{ steps.artname.outputs.OUTPUT_BINARY }} -o/tmp/ *objdump.exe -r -aoa
           cp /tmp/mingw64/bin/objdump.exe shell_bins/windows/objdump.exe
 
       - name: Download libiconv
