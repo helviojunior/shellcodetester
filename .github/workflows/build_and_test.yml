@@ -63,7 +63,7 @@ jobs:
     continue-on-error: ${{ matrix.experimental }}
 
     steps:
-      - name: Checkout KnowsMore
+      - name: Checkout shellcodetester
         uses: actions/checkout@v3
 
       - name: Setup Python ${{ matrix.python-version }}
@@ -76,7 +76,7 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -r tests/requirements-test.txt
 
-      - name: Install knowsmore
+      - name: Install shellcodetester
         run: |
           pip install .
 
@@ -212,6 +212,10 @@ jobs:
           mkdir bin/linux/
           mkdir bin/windows/
           mkdir bin/macosx/
+          echo "" > bin/__init__.py
+          echo "" > bin/linux/__init__.py
+          echo "" > bin/windows/__init__.py
+          echo "" > bin/macosx/__init__.py
           cp ${{steps.download.outputs.download-path}}/objdump_linux* bin/linux/objdump
           cp ${{steps.download2.outputs.download-path}}/objdump_macosx* bin/macosx/objdump
 
@@ -245,7 +249,7 @@ jobs:
           meta=$(cat shell_libs/__meta__.py | sed "s/__version__.*/__version__ = '"${oldv}"-"${current}"'/")
           echo "$meta" > shell_libs/__meta__.py
 
-      - name: Install knowsmore
+      - name: Install shellcodetester
         run: |
           pip install .
 

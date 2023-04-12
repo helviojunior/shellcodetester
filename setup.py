@@ -38,12 +38,18 @@ with open(f"{here}/requirements.txt", "r", encoding="utf-8") as f:
 with open(f"{here}/README.md", "r", encoding="utf-8") as f:
     readme = f.read()
 
-bin_files = []
-if os.path.isdir(f"{here}/bin"):
-    bin_files = [
-        os.path.join(dp, f).replace(here.strip('/') + '/', '').lstrip('/. ')
+# Find package Data
+# each directory must contain __init__.py
+package_data = {"": ["LICENSE"]}
+package_data.update(
+    {
+        dp.replace(here.strip('/') + '/', '').lstrip('/. ').replace('\\', '/').replace('/', '.'): [
+            f for f in filenames if '.py' not in f.lower() and '.ds_store' not in f.lower()
+        ]
         for dp, dn, filenames in os.walk(f"{here}/bin") for f in filenames
-    ]
+        if '.py' not in f.lower() and '.ds_store' not in f.lower()
+    }
+)
 
 setup(
     name=meta["__title__"],
@@ -55,8 +61,8 @@ setup(
     author_email=meta["__author_email__"],
     url=meta["__url__"],
     packages=find_packages(),
-    package_data={"": ["LICENSE"]},
-    data_files=[('', ['requirements.txt'] + bin_files)],
+    package_data=package_data,
+    data_files=[('', ['requirements.txt'])],
     include_package_data=False,
     python_requires=">=3.7, <4",
     install_requires=requires,
