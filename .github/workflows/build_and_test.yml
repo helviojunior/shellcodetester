@@ -227,7 +227,7 @@ jobs:
           cp /tmp/nasm.exe bin/windows/
           unzip -jo /tmp/nasm_mac.zip -d /tmp/
           cp /tmp/nasm bin/macosx/
-          rpm2cpio nasm-2.16.01-0.fc36.x86_64.rpm  | cpio -idmv -D /tmp/
+          rpm2cpio /tmp/nasm_linux.rpm | cpio -idmv -D /tmp/
           cp /tmp/usr/bin/nasm bin/linux/
 
       - name: Download objdump
