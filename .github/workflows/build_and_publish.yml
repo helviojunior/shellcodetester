@@ -132,7 +132,7 @@ jobs:
           retention-days: 3
 
   build_packages:
-    name: Publish on Test Environment
+    name: Build packages
     needs: [binutils_linux, binutils_macosx, build_windows]
     runs-on: ubuntu-latest
     if:
@@ -165,9 +165,9 @@ jobs:
 
       - name: Copy binaries
         run: |
-          mkdir shell_bins/linux/
-          mkdir shell_bins/windows/
-          mkdir shell_bins/macosx/
+          mkdir -p shell_bins/linux/
+          mkdir -p shell_bins/windows/
+          mkdir -p shell_bins/macosx/
           cp ${{steps.download.outputs.download-path}}/objdump_linux* shell_bins/linux/objdump
           cp ${{steps.download2.outputs.download-path}}/objdump_macosx* shell_bins/macosx/objdump
 
