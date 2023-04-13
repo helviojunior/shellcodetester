@@ -100,7 +100,7 @@ jobs:
       - name: Install dependencies
         uses: awalsh128/cache-apt-pkgs-action@latest
         with:
-          packages: wget
+          packages: wget curl jq
           version: 1.0
 
       - name: Get last release files
