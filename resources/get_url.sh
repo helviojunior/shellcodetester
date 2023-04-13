@@ -24,6 +24,7 @@ fi
 
 echo "Version file content"
 cat "$VERSION_FILE"
+echo " "
 
 BINUTILS_VERSION=$(cat "$VERSION_FILE" | grep -oE 'BINUTILS_VERSION=([0-9.]{1,50})' | cut -d'=' -f2)
 GCC_VERSION=$(cat "$VERSION_FILE" | grep -oE 'GCC_VERSION=([0-9.]{1,50})' | cut -d'=' -f2)
