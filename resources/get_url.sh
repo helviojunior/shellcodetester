@@ -7,16 +7,17 @@ C_MINGW_VERSION=10.0.0
 url=$(curl -s https://api.github.com/repos/helviojunior/shellcodetester/releases | jq -r '[ .[] | {id: .id, tag_name: .tag_name, assets: [ .assets[] | select(.name|match("mingw-latest.zip$")) | {name: .name, browser_download_url: .browser_download_url} ]} | select(.assets != []) ] | sort_by(.id) | reverse | .[].assets[].browser_download_url')
 
 if [ "W$url" = "W" ]; then
-    echo "::set-output name=DOWNLOAD_URL::"
+    echo "Release url not found"
     echo "DOWNLOAD_URL=" >> $GITHUB_OUTPUT
     exit 0
 fi
 
-wget -O /tmp/mingw-latest.zip "$url"
+wget -q -O /tmp/mingw-latest.zip "$url"
 unzip -o /tmp/mingw-latest.zip -d /tmp/
 VERSION_FILE=$(find /tmp/ -name "VERSION.txt" -type f 2>/dev/null)
 
 if [ "W$VERSION_FILE" = "W" ] || [ ! -f "$VERSION_FILE" ]; then
+    echo "Version file not found"
     echo "DOWNLOAD_URL=" >> $GITHUB_OUTPUT
     exit 0
 fi
@@ -26,6 +27,7 @@ GCC_VERSION=$(cat "$VERSION_FILE" | grep -oE 'GCC_VERSION=([0-9.]{1,50})' | cut 
 MINGW_VERSION=$(cat "$VERSION_FILE" | grep -oE 'MINGW_VERSION=([0-9.]{1,50})' | cut -d'=' -f2)
 
 if [ "W$BINUTILS_VERSION" != "W$C_BINUTILS_VERSION" ] || [ "W$GCC_VERSION" != "W$C_GCC_VERSION" ]|| [ "W$MINGW_VERSION" != "W$C_MINGW_VERSION" ]; then
+    echo "Version not match"
     echo "DOWNLOAD_URL=" >> $GITHUB_OUTPUT
     exit 0
 fi
