@@ -13,7 +13,7 @@ if [ "W$url" = "W" ]; then
 fi
 
 wget -q -O /tmp/mingw-latest.zip "$url"
-unzip -o /tmp/mingw-latest.zip -d /tmp/
+unzip -q -o /tmp/mingw-latest.zip -d /tmp/
 VERSION_FILE=$(find /tmp/ -name "VERSION.txt" -type f 2>/dev/null)
 
 if [ "W$VERSION_FILE" = "W" ] || [ ! -f "$VERSION_FILE" ]; then
@@ -21,6 +21,9 @@ if [ "W$VERSION_FILE" = "W" ] || [ ! -f "$VERSION_FILE" ]; then
     echo "DOWNLOAD_URL=" >> $GITHUB_OUTPUT
     exit 0
 fi
+
+echo "Version file content"
+cat VERSION_FILE
 
 BINUTILS_VERSION=$(cat "$VERSION_FILE" | grep -oE 'BINUTILS_VERSION=([0-9.]{1,50})' | cut -d'=' -f2)
 GCC_VERSION=$(cat "$VERSION_FILE" | grep -oE 'GCC_VERSION=([0-9.]{1,50})' | cut -d'=' -f2)
