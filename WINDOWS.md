@@ -59,7 +59,7 @@ After you install any package (as shellcodetester example) using `pip install sh
 ### Install GCC
 In order to install GCC you have several options
 1. Install Visual Studio (the best option)
-2. Install MinGW64 from [SourceForge project](https://sourceforge.net/projects/mingw/files/MinGW/Base/gcc/)
+2. Install MinGW64 from [Last Release](https://github.com/helviojunior/shellcodetester/releases/latest/download/mingw-latest.zip)
 3. Install Dev C++ (the simplest one)
 
 #### Installing DEV C++
