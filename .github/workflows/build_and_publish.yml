@@ -43,14 +43,17 @@ jobs:
       - name: Install dependencies
         uses: awalsh128/cache-apt-pkgs-action@latest
         with:
-          packages: wget jq zip unzip curl ca-certificates libgmp-dev libmpc-dev libmpfr-dev libisl-dev xz-utils texinfo patch p7zip cmake make m4 gcc g++
+          packages: rsync wget jq zip unzip curl ca-certificates libgmp-dev libmpc-dev libmpfr-dev libisl-dev xz-utils texinfo patch p7zip cmake make m4 gcc g++
           version: 1.0
+
+      - name: Checkout ShellcodeTester
+        uses: actions/checkout@v3
 
       - name: Get last release files
         id: download
         run: |
-          url=$(curl -s https://api.github.com/repos/helviojunior/shellcodetester/releases/latest | jq -r '.assets[] | select(.name|match("mingw-latest.zip$")) | .browser_download_url')
-          echo "::set-output name=DOWNLOAD_URL::${url}"
+          chmod +x ./resources/get_url.sh
+          ./resources/get_url.sh
 
       - name: Download last release
         if:

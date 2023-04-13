@@ -13,8 +13,6 @@ EXPAT_VERSION=2.4.8
 BINUTILS_VERSION=2.39
 GCC_VERSION=12.2.0
 MINGW_VERSION=10.0.0
-MAKE_VERSION=4.2.1
-GDB_VERSION=12.1
 
 ARG=${1:-64}
 if [ "${ARG}" == "32" ]; then
@@ -26,7 +24,7 @@ if [ "${ARG}" == "32" ]; then
 elif [ "${ARG}" == "64" ]; then
   NAME=gcc-v${GCC_VERSION}-mingw-v${MINGW_VERSION}-x86_64
   TARGET=x86_64-w64-mingw32
-  EXTRA_CRT_ARGS=--disable-lib32
+  EXTRA_CRT_ARGS=
   EXTRA_GCC_ARGS=
   FINAL_NAME=mingw64
 else
@@ -87,8 +85,6 @@ get https://github.com/libexpat/libexpat/releases/download/R_${EXPAT_VERSION//./
 get https://ftp.gnu.org/gnu/binutils/binutils-${BINUTILS_VERSION}.tar.xz
 get https://ftp.gnu.org/gnu/gcc/gcc-${GCC_VERSION}/gcc-${GCC_VERSION}.tar.xz
 get https://sourceforge.net/projects/mingw-w64/files/mingw-w64/mingw-w64-release/mingw-w64-v${MINGW_VERSION}.tar.bz2
-get https://ftp.gnu.org/gnu/gdb/gdb-${GDB_VERSION}.tar.xz
-get https://ftp.gnu.org/gnu/make/make-${MAKE_VERSION}.tar.bz2
 
 FOLDER="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
@@ -335,6 +331,9 @@ find ${FINAL} -name '*.a'   -print0 | xargs -0 -n 8 -P `nproc` ${TARGET}-strip -
 rm ${FINAL}/mingw
 mkdir -p ${ZIP}/${FINAL_NAME}
 rsync -av ${FINAL}/* ${ZIP}/${FINAL_NAME}
+echo "GCC_VERSION=${GCC_VERSION}" > ${ZIP}/${FINAL_NAME}/VERSION.txt
+echo "MINGW_VERSION=${MINGW_VERSION}" >> ${ZIP}/${FINAL_NAME}/VERSION.txt
+echo "BINUTILS_VERSION=${BINUTILS_VERSION}" >> ${ZIP}/${FINAL_NAME}/VERSION.txt
 p=$(pwd)
 cd ${ZIP}
 zip -r -9 ${OUTPUT}/mingw-latest.zip ${FINAL_NAME}
