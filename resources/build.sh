@@ -335,7 +335,10 @@ find ${FINAL} -name '*.a'   -print0 | xargs -0 -n 8 -P `nproc` ${TARGET}-strip -
 rm ${FINAL}/mingw
 mkdir -p ${ZIP}/${FINAL_NAME}
 rsync -av ${FINAL}/* ${ZIP}/${FINAL_NAME}
-zip -r -9 ${OUTPUT}/mingw-latest.zip ${ZIP}
+p=$(pwd)
+cd ${ZIP}
+zip -r -9 ${OUTPUT}/mingw-latest.zip ${FINAL_NAME}
+cd ${p}
 
 if [[ -v GITHUB_WORKFLOW ]]; then
   echo "::set-output name=GCC_VERSION::${GCC_VERSION}"
