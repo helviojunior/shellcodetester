@@ -109,14 +109,9 @@ jobs:
           chmod +x ./resources/get_url.sh
           ./resources/get_url.sh
 
-      - name: Download last mingw release
-        if:
-          steps.download.outputs.DOWNLOAD_URL != ''
+      - name: Download last release
         run: |
           wget -O /tmp/mingw-latest.zip "${{ steps.download.outputs.DOWNLOAD_URL }}"
-
-      - name: Download last binutils release
-        run: |
           wget -O /tmp/binutils.zip https://github.com/helviojunior/shellcodetester/releases/latest/download/binutils.zip
 
       - uses: actions/upload-artifact@v2
