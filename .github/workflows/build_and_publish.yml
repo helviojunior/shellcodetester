@@ -289,6 +289,12 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+      - name: Install dependencies
+        uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: rsync
+          version: 1.0
+
       - name: Download arfactory
         uses: actions/download-artifact@v3
         id: download
@@ -301,7 +307,10 @@ jobs:
           mkdir shell_bins/linux/
           mkdir shell_bins/windows/
           mkdir shell_bins/macosx/
-          unzip -o ${{steps.download.outputs.download-path}}/binutils.zip -d shell_bins/
+          unzip -o ${{steps.download.outputs.download-path}}/binutils.zip -d /tmp/
+          find /tmp/ -name "linux" -type d -exec rsync -av {}/*  shell_bins/linux/ \;
+          find /tmp/ -name "windows" -type d -exec rsync -av {}/*  shell_bins/windows/ \;
+          find /tmp/ -name "macosx" -type d -exec rsync -av {}/*  shell_bins/macosx/ \;
           echo "" > shell_bins/__init__.py
           echo "" > shell_bins/linux/__init__.py
           echo "" > shell_bins/windows/__init__.py
