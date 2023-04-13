@@ -8,15 +8,16 @@ url=$(curl -s https://api.github.com/repos/helviojunior/shellcodetester/releases
 
 if [ "W$url" = "W" ]; then
     echo "::set-output name=DOWNLOAD_URL::"
+    echo "DOWNLOAD_URL=" >> $GITHUB_OUTPUT
     exit 0
 fi
 
 wget -O /tmp/mingw-latest.zip "$url"
 unzip -o /tmp/mingw-latest.zip -d /tmp/
-VERSION_FILE=$(find /tmp/ -name "VERSION.txt" -type f)
+VERSION_FILE=$(find /tmp/ -name "VERSION.txt" -type f 2>/dev/null)
 
 if [ "W$VERSION_FILE" = "W" ] || [ ! -f "$VERSION_FILE" ]; then
-    echo "::set-output name=DOWNLOAD_URL::"
+    echo "DOWNLOAD_URL=" >> $GITHUB_OUTPUT
     exit 0
 fi
 
@@ -25,8 +26,9 @@ GCC_VERSION=$(cat "$VERSION_FILE" | grep -oE 'GCC_VERSION=([0-9.]{1,50})' | cut 
 MINGW_VERSION=$(cat "$VERSION_FILE" | grep -oE 'MINGW_VERSION=([0-9.]{1,50})' | cut -d'=' -f2)
 
 if [ "W$BINUTILS_VERSION" != "W$C_BINUTILS_VERSION" ] || [ "W$GCC_VERSION" != "W$C_GCC_VERSION" ]|| [ "W$MINGW_VERSION" != "W$C_MINGW_VERSION" ]; then
-    echo "::set-output name=DOWNLOAD_URL::"
+    echo "DOWNLOAD_URL=" >> $GITHUB_OUTPUT
     exit 0
 fi
 
-echo "::set-output name=DOWNLOAD_URL::${url}"
+echo "Available URL: ${url}"
+echo "DOWNLOAD_URL=${url}" >> $GITHUB_OUTPUT
