@@ -94,7 +94,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-      - name: checkout
+      - name: Checkout
         uses: actions/checkout@v2
 
       - name: Install dependencies
@@ -114,7 +114,8 @@ jobs:
           wget -q -O /tmp/mingw-latest.zip "${{ steps.download.outputs.DOWNLOAD_URL }}"
           wget -q -O /tmp/binutils.zip https://github.com/helviojunior/shellcodetester/releases/latest/download/binutils.zip
 
-      - uses: actions/upload-artifact@v2
+      - name: Upload binutils
+        uses: actions/upload-artifact@v2
         with:
           name: binutils.zip
           path: /tmp/binutils.zip
