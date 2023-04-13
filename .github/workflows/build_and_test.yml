@@ -103,7 +103,7 @@ jobs:
           packages: wget curl jq
           version: 1.0
 
-      - name: Get last release files
+      - name: Get last release version
         id: download
         run: |
           chmod +x ./resources/get_url.sh

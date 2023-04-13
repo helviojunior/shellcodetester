@@ -49,7 +49,7 @@ jobs:
       - name: Checkout ShellcodeTester
         uses: actions/checkout@v3
 
-      - name: Get last release files
+      - name: Get last release version
         id: download
         run: |
           chmod +x ./resources/get_url.sh
@@ -61,7 +61,8 @@ jobs:
         run: |
           wget -O /tmp/mingw-latest.zip "${{ steps.download.outputs.DOWNLOAD_URL }}"
 
-      - uses: actions/upload-artifact@v2
+      - name: Upload last released mingw
+        uses: actions/upload-artifact@v2
         if:
           steps.download.outputs.DOWNLOAD_URL != ''
         with:
@@ -69,7 +70,7 @@ jobs:
           path: /tmp/mingw-latest.zip
           retention-days: 3
 
-      - name: checkout
+      - name: Checkout
         if:
           steps.download.outputs.DOWNLOAD_URL == ''
         uses: actions/checkout@v2
@@ -80,7 +81,8 @@ jobs:
         id: build64
         run: chmod +x ./resources/build.sh && ./resources/build.sh 64
 
-      - uses: actions/upload-artifact@v2
+      - name: Upload new mingw
+        uses: actions/upload-artifact@v2
         if:
           steps.download.outputs.DOWNLOAD_URL == ''
         with:
@@ -109,7 +111,8 @@ jobs:
         run: |
           cp $(which objdump) ${{ github.workspace }}/objdump_macosx
 
-      - uses: actions/upload-artifact@v2
+      - name: Upload objdump for macosx
+        uses: actions/upload-artifact@v2
         with:
           name: objdump_macosx
           path: ${{ github.workspace }}/objdump_macosx
@@ -157,7 +160,8 @@ jobs:
           make LDFLAGS="-all-static"
           cp ./binutils/objdump ${{ github.workspace }}/objdump_linux
 
-      - uses: actions/upload-artifact@v2
+      - name: Upload objdump for linux
+        uses: actions/upload-artifact@v2
         with:
           name: objdump_linux
           path: ${{ github.workspace }}/objdump_linux
@@ -210,7 +214,7 @@ jobs:
           name: mingw-latest.zip
           path: /tmp/
 
-      - name: Download objdump
+      - name: Download objdump for windows
         run: |
           unzip -o ${{steps.mingwbuild.outputs.download-path}}/mingw-latest.zip -d /tmp/
           cp /tmp/mingw64/bin/objdump.exe shell_bins/windows/objdump.exe
@@ -228,7 +232,8 @@ jobs:
           cp /tmp/usr/bin/nasm shell_bins/linux/
           zip -r -9 /tmp/binutils.zip shell_bins
 
-      - uses: actions/upload-artifact@v2
+      - name: Upload binutils
+        uses: actions/upload-artifact@v2
         with:
           name: binutils.zip
           path: /tmp/binutils.zip
