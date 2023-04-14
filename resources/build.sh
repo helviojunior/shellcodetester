@@ -193,7 +193,7 @@ popd
 
 export PATH=${BOOTSTRAP}/bin:$PATH
 
-
+sleep 60
 echo "[`date`] Compiling cross mingw crt" >> ${STATUS}
 mkdir -p ${BUILD}/x-mingw-w64-crt && pushd ${BUILD}/x-mingw-w64-crt
 ${SOURCE}/mingw-w64-v${MINGW_VERSION}/mingw-w64-crt/configure \
@@ -385,6 +385,7 @@ make -j`nproc`
 make install
 popd
 
+sleep 60
 echo "[`date`] Compiling mingw crt" >> ${STATUS}
 mkdir -p ${BUILD}/mingw-w64-crt && pushd ${BUILD}/mingw-w64-crt
 ${SOURCE}/mingw-w64-v${MINGW_VERSION}/mingw-w64-crt/configure \
