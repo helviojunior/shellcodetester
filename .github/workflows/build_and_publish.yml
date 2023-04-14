@@ -37,7 +37,7 @@ jobs:
   build_windows:
     name: Build windows binaries
     needs: lint
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     env:
       CCACHE_DISABLE: 1
     steps:
