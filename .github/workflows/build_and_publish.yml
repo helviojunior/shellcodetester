@@ -37,7 +37,7 @@ jobs:
   build_windows:
     name: Build windows binaries
     needs: lint
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     env:
       CCACHE_DISABLE: 1
     steps:
@@ -45,7 +45,7 @@ jobs:
       - name: Install dependencies
         uses: awalsh128/cache-apt-pkgs-action@latest
         with:
-          packages: ca-certificates libgmp-dev libmpc-dev libmpfr-dev libisl-dev xz-utils texinfo patch bzip2 p7zip cmake make curl m4 zip unzip rsync wget gcc g++ libz-dev g++-multilib gcc-multilib
+          packages: rsync wget jq zip unzip curl ca-certificates
           version: 1.0
 
       - name: Checkout ShellcodeTester
@@ -81,7 +81,7 @@ jobs:
         if:
           steps.download.outputs.DOWNLOAD_URL == ''
         id: build64
-        run: chmod +x ./resources/build.sh && ./resources/build.sh
+        run: chmod +x ./resources/build.sh && sudo ./resources/build.sh
         continue-on-error: true
 
       - name: Upload new mingw
