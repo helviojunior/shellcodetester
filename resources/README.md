@@ -13,16 +13,7 @@ To build binaries locally run `build.sh`. Make sure you have installed all neces
 To build binaries using Docker, run:
 
 ```bash
-cat << EOF > start.sh
-#!/bin/bash
-apt update
-DEBIAN_FRONTEND=noninteractive apt install --no-install-recommends -y \
-    ca-certificates libgmp-dev libmpc-dev libmpfr-dev libisl-dev xz-utils texinfo patch bzip2 p7zip cmake make curl m4 gcc g++ zip unzip rsync
-chmod +x /output/build.sh
-/output/build.sh 64
-EOF
-chmod +x start.sh
-docker run -ti --rm -v `pwd`:/output -e OUTPUT=/output -w /mnt ubuntu:22.04 /output/start.sh
+docker run -ti --rm -v `pwd`:/output -e OUTPUT=/output -w /mnt ubuntu:22.04 /output/build.sh
 ```
 
 [gcc]: https://gcc.gnu.org/
