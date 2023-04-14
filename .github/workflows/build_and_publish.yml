@@ -40,6 +40,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       CCACHE_DISABLE: 1
+      OUTPUT: github.workspace
     steps:
 
       - name: Install dependencies
@@ -90,7 +91,7 @@ jobs:
           steps.download.outputs.DOWNLOAD_URL == '' && steps.build64.outcome == 'success'
         with:
           name: mingw-latest.zip
-          path: mingw-latest.zip
+          path: ${{ github.workspace }}/mingw-latest.zip
           retention-days: 3
 
       - name: Build 64-bit - retry
@@ -105,7 +106,7 @@ jobs:
           steps.download.outputs.DOWNLOAD_URL == '' && steps.build64.outcome == 'failure'
         with:
           name: mingw-latest.zip
-          path: mingw-latest.zip
+          path: ${{ github.workspace }}/mingw-latest.zip
           retention-days: 3
 
   binutils_macosx:
