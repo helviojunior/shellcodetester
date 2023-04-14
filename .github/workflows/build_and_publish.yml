@@ -97,7 +97,7 @@ jobs:
         if:
           steps.download.outputs.DOWNLOAD_URL == '' && steps.build64.outcome == 'failure'
         id: build64_2
-        run: chmod +x ./resources/build.sh && ./resources/build.sh
+        run: chmod +x ./resources/build.sh && sudo ./resources/build.sh
 
       - name: Upload new mingw
         uses: actions/upload-artifact@v2
