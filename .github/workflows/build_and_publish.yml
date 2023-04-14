@@ -45,7 +45,7 @@ jobs:
       - name: Install dependencies
         uses: awalsh128/cache-apt-pkgs-action@latest
         with:
-          packages: rsync wget jq zip unzip curl ca-certificates
+          packages: ca-certificates libgmp-dev libmpc-dev libmpfr-dev libisl-dev xz-utils texinfo patch bzip2 p7zip cmake make curl m4 zip unzip rsync wget gcc g++ ibz-dev g++-multilib gcc-multilib
           version: 1.0
 
       - name: Checkout ShellcodeTester
