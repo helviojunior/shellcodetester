@@ -90,7 +90,7 @@ jobs:
           steps.download.outputs.DOWNLOAD_URL == '' && steps.build64.outcome == 'success'
         with:
           name: mingw-latest.zip
-          path: ./${{ steps.build64.outputs.OUTPUT_BINARY }}
+          path: mingw-latest.zip
           retention-days: 3
 
       - name: Build 64-bit - retry
@@ -105,7 +105,7 @@ jobs:
           steps.download.outputs.DOWNLOAD_URL == '' && steps.build64.outcome == 'failure'
         with:
           name: mingw-latest.zip
-          path: ./${{ steps.build64_2.outputs.OUTPUT_BINARY }}
+          path: mingw-latest.zip
           retention-days: 3
 
   binutils_macosx:
