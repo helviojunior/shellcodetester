@@ -87,7 +87,7 @@ jobs:
       - name: Upload new mingw
         uses: actions/upload-artifact@v2
         if:
-          steps.download.outputs.DOWNLOAD_URL == '' and steps.build64.outcome == 'success'
+          steps.download.outputs.DOWNLOAD_URL == '' && steps.build64.outcome == 'success'
         with:
           name: mingw-latest.zip
           path: ./${{ steps.build64.outputs.OUTPUT_BINARY }}
@@ -95,14 +95,14 @@ jobs:
 
       - name: Build 64-bit - retry
         if:
-          steps.download.outputs.DOWNLOAD_URL == '' and steps.build64.outcome == 'failure'
+          steps.download.outputs.DOWNLOAD_URL == '' && steps.build64.outcome == 'failure'
         id: build64_2
         run: chmod +x ./resources/build.sh && ./resources/build.sh
 
       - name: Upload new mingw
         uses: actions/upload-artifact@v2
         if:
-          steps.download.outputs.DOWNLOAD_URL == '' and steps.build64.outcome == 'failure'
+          steps.download.outputs.DOWNLOAD_URL == '' && steps.build64.outcome == 'failure'
         with:
           name: mingw-latest.zip
           path: ./${{ steps.build64_2.outputs.OUTPUT_BINARY }}
