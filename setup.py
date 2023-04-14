@@ -93,6 +93,7 @@ setup(
     entry_points={'console_scripts': [
         'shellcodetester=shellcodetester.shellcodetester:run',
         'nasm_shell=nasmshell.nasmshell:run',
+        'nasmshell=nasmshell.nasmshell:run',
         ]
     },
     project_urls={
