@@ -1,4 +1,4 @@
-__version__ = '0.2.6'
+__version__ = '0.2.7'
 __title__ = "ShellcodeTester"
 __description__ = "ShellcodeTester is a tool to assembly, compile and test ASM shellcode."
 __url__ = "https://github.com/helviojunior/shellcodetester"
