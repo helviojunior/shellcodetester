@@ -90,6 +90,12 @@ class Arguments(object):
                             dest='fill',
                             help=Color.s('Fill entire page with NOP (default: {G}false{W})'))
 
+        custom.add_argument('--writable-text',
+                            action='store_true',
+                            default=False,
+                            dest='writable_text',
+                            help=Color.s('Mark the output .text section as writable{W}'))
+
         custom.add_argument('--list',
                             action='store_true',
                             default=False,

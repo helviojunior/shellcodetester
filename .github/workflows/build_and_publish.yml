@@ -249,7 +249,9 @@ jobs:
           cp /tmp/nasm shell_bins/macosx/
           rpm2cpio /tmp/nasm_linux.rpm | cpio -idmv -D /tmp/
           cp /tmp/usr/bin/nasm shell_bins/linux/
-          zip -r -9 /tmp/binutils.zip shell_bins
+          pushd shell_bins
+          zip -r -9 /tmp/binutils.zip .
+          popd
 
       - name: Upload binutils
         uses: actions/upload-artifact@v2

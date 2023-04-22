@@ -28,6 +28,7 @@ class Configuration(object):
     fill = False
     bad_chars = bytearray([0x00])
     cave_size = 200
+    writable_text = False
 
     @staticmethod
     def initialize():
@@ -124,8 +125,10 @@ class Configuration(object):
         Configuration.breakpoint = args.breakpoint
         Configuration.remove = args.remove
         Configuration.fill = args.fill
+        Configuration.writable_text = args.writable_text
         Configuration.transform_format = Transform.parse_format(args.transform_format)
 
+        Logger.pl('     {C}writable .text section:{O} %s{W}' % Configuration.writable_text)
         Logger.pl('     {C}code cave size:{O} %s{W}' % Configuration.cave_size)
         Logger.pl('     {C}transform format:{O} %s{W}' % (Transform.get_name(Configuration.transform_format)))
 

@@ -59,7 +59,11 @@ class ShellcodeTester(Runner):
 
             asm.print_payload(Configuration.transform_format, Configuration.bad_chars)
 
-            comp = Compiler(Configuration.asm_file, asm.assembled_data, Configuration.bad_chars, Configuration.remove)
+            comp = Compiler(Configuration.asm_file,
+                            asm.assembled_data,
+                            Configuration.bad_chars,
+                            Configuration.remove,
+                            Configuration.writable_text)
             if not comp.compile():
                 sys.exit(2)
 

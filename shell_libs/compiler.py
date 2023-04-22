@@ -20,17 +20,20 @@ class Compiler(AsmFile):
     assembled_data = None
     bad_chars = None
     remove_bad_chars = False
+    writable_text = False
 
     def __init__(self, filename: str,
                  assembled_data: bytearray,
                  bad_chars: [bytearray, bytes] = bytearray(),
-                 remove_bad_chars: bool = False):
+                 remove_bad_chars: bool = False,
+                 writable_text: bool = False):
         super().__init__(filename)
         self.assembled_data = assembled_data
         self.c_file = Path(f"{self.file_pattern}.c")
         self.bin_file = Path(f"{self.get_name()}")
         self.bad_chars = bytearray([b for b in bad_chars])
         self.remove_bad_chars = remove_bad_chars
+        self.writable_text = writable_text
 
     def get_name(self) -> str:
         import platform
@@ -115,27 +118,30 @@ class Compiler(AsmFile):
                 f.write('\n')
 
                 f.write('int wtext(){\n')
-                f.write('    \n')
-                f.write('    void       *const target = &shell;\n')
-                f.write('    size_t      length = (size_t)((intptr_t) end_of_code - (intptr_t)shell);\n')
-                f.write('    #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)\n')
-                f.write('        SYSTEM_INFO si;\n')
-                f.write('        GetSystemInfo(&si);\n')
-                f.write('        const long  page = si.dwPageSize;\n')
-                f.write('        DWORD l=0;\n')
-                f.write('        void       *start = (char *)target - ((long)target % page);\n')
-                f.write('        size_t      bytes = length + (size_t)((long)target % page);\n')
-                f.write('        VirtualProtect(start, bytes, PAGE_EXECUTE_READWRITE, &l);\n')
-                f.write('    #elif __linux__\n')
-                f.write('        const long  page = sysconf(_SC_PAGESIZE);\n')
-                f.write('        void       *start = (char *)target - ((long)target % page);\n')
-                f.write('        size_t      bytes = length + (size_t)((long)target % page);\n')
-                f.write('        if (mprotect(start, page, PROT_READ | PROT_WRITE | PROT_EXEC))\n')
-                f.write('            return errno;\n')
-                f.write('    #else\n')
-                f.write('        return errno;\n')
-                f.write('    #endif\n')
+                if self.writable_text:
+                    f.write('    void       *const target = &shell;\n')
+                    f.write('    size_t      length = (size_t)((intptr_t) end_of_code - (intptr_t)shell);\n')
+                    f.write('    #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)\n')
+                    f.write('        SYSTEM_INFO si;\n')
+                    f.write('        GetSystemInfo(&si);\n')
+                    f.write('        const long  page = si.dwPageSize;\n')
+                    f.write('        DWORD l=0;\n')
+                    f.write('        void       *start = (char *)target - ((long)target % page);\n')
+                    f.write('        size_t      bytes = length + (size_t)((long)target % page);\n')
+                    f.write('        VirtualProtect(start, bytes, PAGE_EXECUTE_READWRITE, &l);\n')
+                    f.write('    #elif __linux__\n')
+                    f.write('        const long  page = sysconf(_SC_PAGESIZE);\n')
+                    f.write('        void       *start = (char *)target - ((long)target % page);\n')
+                    f.write('        size_t      bytes = length + (size_t)((long)target % page);\n')
+                    f.write('        if (mprotect(start, page, PROT_READ | PROT_WRITE | PROT_EXEC))\n')
+                    f.write('            return errno;\n')
+                    f.write('    #else\n')
+                    f.write('        return errno;\n')
+                    f.write('    #endif\n')
+                else:
+                    f.write('        return 0;\n')
                 f.write('}\n')
+                f.write('\n')
 
                 f.write('void shell(int *code_cave, int *data) {\n')
 
