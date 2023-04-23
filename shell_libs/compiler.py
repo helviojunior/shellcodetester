@@ -64,7 +64,7 @@ class Compiler(AsmFile):
                 f.write('#include<string.h>\n')
                 f.write('#include<time.h>\n')
                 f.write('\n')
-                f.write('#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)\n')
+                f.write('#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__) || defined(WIN64) || defined(_WIN64) || defined(__WIN64__)\n')
                 f.write('    #include <windows.h>\n')
                 f.write('#elif __APPLE__\n')
                 f.write('    #include <TargetConditionals.h>\n')
@@ -121,7 +121,7 @@ class Compiler(AsmFile):
                 if self.writable_text:
                     f.write('    void       *const target = &shell;\n')
                     f.write('    size_t      length = (size_t)((intptr_t) end_of_code - (intptr_t)shell);\n')
-                    f.write('    #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)\n')
+                    f.write('    #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__) || defined(WIN64) || defined(_WIN64) || defined(__WIN64__)\n')
                     f.write('        SYSTEM_INFO si;\n')
                     f.write('        GetSystemInfo(&si);\n')
                     f.write('        const long  page = si.dwPageSize;\n')
