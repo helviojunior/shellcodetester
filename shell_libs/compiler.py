@@ -119,8 +119,8 @@ class Compiler(AsmFile):
 
                 f.write('int wtext(){\n')
                 if self.writable_text:
-                    f.write('    void       *const target = &shell;\n')
-                    f.write('    size_t      length = (size_t)((intptr_t) end_of_code - (intptr_t)shell);\n')
+                    f.write('    void       *const target = &main;\n')
+                    f.write('    size_t      length = (size_t)((intptr_t) end_of_code - (intptr_t)main);\n')
                     f.write('    #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__) || defined(WIN64) || defined(_WIN64) || defined(__WIN64__)\n')
                     f.write('        SYSTEM_INFO si;\n')
                     f.write('        GetSystemInfo(&si);\n')
