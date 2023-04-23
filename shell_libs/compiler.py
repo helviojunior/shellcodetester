@@ -127,7 +127,7 @@ class Compiler(AsmFile):
                     f.write('        const long  page = si.dwPageSize;\n')
                     f.write('        DWORD l=0;\n')
                     f.write('        void       *start = (char *)target - ((long)target % page);\n')
-                    f.write('        size_t      bytes = length + (size_t)((long)target % page);\n')
+                    f.write('        size_t      bytes = length;\n')
                     f.write('        VirtualProtect(start, bytes, PAGE_EXECUTE_READWRITE, &l);\n')
                     f.write('    #elif __linux__\n')
                     f.write('        const long  page = sysconf(_SC_PAGESIZE);\n')
