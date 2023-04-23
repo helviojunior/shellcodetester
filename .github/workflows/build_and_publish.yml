@@ -330,7 +330,8 @@ jobs:
           mkdir shell_bins/linux/
           mkdir shell_bins/windows/
           mkdir shell_bins/macosx/
-          unzip -o ${{steps.download.outputs.download-path}}/binutils.zip -d ./
+          unzip -o ${{steps.download.outputs.download-path}}/binutils.zip -d ./shell_bins
+          [ -d ./shell_bins/shell_bins ] && rsync -av ./shell_bins/shell_bins/* shell_bins/
           echo "" > shell_bins/__init__.py
           echo "" > shell_bins/linux/__init__.py
           echo "" > shell_bins/windows/__init__.py
