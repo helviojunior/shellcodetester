@@ -132,7 +132,7 @@ class Compiler(AsmFile):
                     f.write('    #elif __linux__\n')
                     f.write('        const long  page = sysconf(_SC_PAGESIZE);\n')
                     f.write('        void       *start = (char *)target - ((long)target % page);\n')
-                    f.write('        size_t      bytes = length + (size_t)((long)target % page);\n')
+                    f.write('        size_t      bytes = length;\n')
                     f.write('        if (mprotect(start, page, PROT_READ | PROT_WRITE | PROT_EXEC))\n')
                     f.write('            return errno;\n')
                     f.write('    #else\n')
