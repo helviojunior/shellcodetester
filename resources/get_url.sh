@@ -15,7 +15,7 @@ fi
 echo "URL: $url"
 
 rm -rf /tmp/mingw-latest.zip
-wget -q -O /tmp/mingw-latest.zip "$url"
+curl -Lo /tmp/mingw-latest.zip "$url"
 if [ ! -f "/tmp/mingw-latest.zip" ]; then
     echo "Zip file not found"
     exit 0

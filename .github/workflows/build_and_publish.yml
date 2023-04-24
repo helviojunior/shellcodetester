@@ -62,7 +62,7 @@ jobs:
         if:
           steps.download.outputs.DOWNLOAD_URL != ''
         run: |
-          wget -O /tmp/mingw-latest.zip "${{ steps.download.outputs.DOWNLOAD_URL }}"
+          curl -Lo /tmp/mingw-latest.zip "${{ steps.download.outputs.DOWNLOAD_URL }}"
 
       - name: Upload last released mingw
         uses: actions/upload-artifact@v2
