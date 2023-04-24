@@ -142,8 +142,9 @@ jobs:
         run: |
           p=$(pwd)
           file=$(find ${p}/dist/ -name "*.tar.gz" | head -n 1)
+          echo "File: ${file}"
           [ "W$file" == "W" ] && exit 1
-          [ ! -d "$file" ] && exit 1
+          [ ! -f "$file" ] && exit 2
           name=$(basename "$file")
           echo "NAME=${name}" >> $GITHUB_OUTPUT
           echo "DIST_FILE=${file}" >> $GITHUB_OUTPUT
