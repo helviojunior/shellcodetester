@@ -8,16 +8,15 @@ url=$(curl -s https://api.github.com/repos/helviojunior/shellcodetester/releases
 
 if [ "W$url" = "W" ]; then
     echo "Release url not found"
-    echo "DOWNLOAD_URL=" >> $GITHUB_OUTPUT
+    echo "MINGW_URL=" >> $GITHUB_OUTPUT
     exit 0
 fi
-
-echo "URL: $url"
 
 rm -rf /tmp/mingw-latest.zip
 wget -O /tmp/mingw-latest.zip "$url"
 if [ ! -f "/tmp/mingw-latest.zip" ]; then
     echo "Zip file not found"
+    echo "MINGW_URL=" >> $GITHUB_OUTPUT
     exit 0
 fi
 
@@ -27,7 +26,7 @@ VERSION_FILE=$(find /tmp/ -name "VERSION.txt" -type f 2>/dev/null)
 
 if [ "W$VERSION_FILE" = "W" ] || [ ! -f "$VERSION_FILE" ]; then
     echo "Version file not found"
-    echo "DOWNLOAD_URL=" >> $GITHUB_OUTPUT
+    echo "MINGW_URL=" >> $GITHUB_OUTPUT
     exit 0
 fi
 
@@ -41,9 +40,20 @@ MINGW_VERSION=$(cat "$VERSION_FILE" | grep -oE 'MINGW_VERSION=([0-9.]{1,50})' | 
 
 if [ "W$BINUTILS_VERSION" != "W$C_BINUTILS_VERSION" ] || [ "W$GCC_VERSION" != "W$C_GCC_VERSION" ]|| [ "W$MINGW_VERSION" != "W$C_MINGW_VERSION" ]; then
     echo "Version not match"
-    echo "DOWNLOAD_URL=" >> $GITHUB_OUTPUT
+    echo "MINGW_URL=" >> $GITHUB_OUTPUT
     exit 0
 fi
 
-echo "Available URL: ${url}"
-echo "DOWNLOAD_URL=${url}" >> $GITHUB_OUTPUT
+url2=$(curl -s https://api.github.com/repos/helviojunior/shellcodetester/releases | jq -r '[ .[] | {id: .id, tag_name: .tag_name, assets: [ .assets[] | select(.name|match("binutils.zip$")) | {name: .name, browser_download_url: .browser_download_url} ]} | select(.assets != []) ] | sort_by(.id) | reverse | first(.[].assets[]) | .browser_download_url')
+
+if [ "W$url2" = "W" ]; then
+    echo "Binutils Release url not found"
+    echo "BINUTILS_URL=" >> $GITHUB_OUTPUT
+    exit 0
+fi
+
+echo "Available URL for MINGW: ${url}"
+echo "MINGW_URL=${url}" >> $GITHUB_OUTPUT
+
+echo "Available URL for Binutils: ${url}"
+echo "BINUTILS_URL=${url2}" >> $GITHUB_OUTPUT

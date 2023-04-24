@@ -60,14 +60,14 @@ jobs:
 
       - name: Download last release
         if:
-          steps.download.outputs.DOWNLOAD_URL != ''
+          steps.download.outputs.MINGW_URL != ''
         run: |
-          wget -O /tmp/mingw-latest.zip "${{ steps.download.outputs.DOWNLOAD_URL }}"
+          wget -O /tmp/mingw-latest.zip "${{ steps.download.outputs.MINGW_URL }}"
 
       - name: Upload last released mingw
         uses: actions/upload-artifact@v2
         if:
-          steps.download.outputs.DOWNLOAD_URL != ''
+          steps.download.outputs.MINGW_URL != ''
         with:
           name: mingw-latest.zip
           path: /tmp/mingw-latest.zip
@@ -75,12 +75,12 @@ jobs:
 
       - name: Checkout
         if:
-          steps.download.outputs.DOWNLOAD_URL == ''
+          steps.download.outputs.MINGW_URL == ''
         uses: actions/checkout@v2
 
       - name: Build 64-bit
         if:
-          steps.download.outputs.DOWNLOAD_URL == ''
+          steps.download.outputs.MINGW_URL == ''
         id: build64
         run: chmod +x ./resources/build.sh && sudo ./resources/build.sh
         continue-on-error: true
@@ -88,7 +88,7 @@ jobs:
       - name: Upload new mingw
         uses: actions/upload-artifact@v2
         if:
-          steps.download.outputs.DOWNLOAD_URL == '' && steps.build64.outcome == 'success'
+          steps.download.outputs.MINGW_URL == '' && steps.build64.outcome == 'success'
         with:
           name: mingw-latest.zip
           path: ${{ github.workspace }}/mingw-latest.zip
@@ -96,14 +96,14 @@ jobs:
 
       - name: Build 64-bit - retry
         if:
-          steps.download.outputs.DOWNLOAD_URL == '' && steps.build64.outcome == 'failure'
+          steps.download.outputs.MINGW_URL == '' && steps.build64.outcome == 'failure'
         id: build64_2
         run: chmod +x ./resources/build.sh && sudo ./resources/build.sh
 
       - name: Upload new mingw
         uses: actions/upload-artifact@v2
         if:
-          steps.download.outputs.DOWNLOAD_URL == '' && steps.build64.outcome == 'failure'
+          steps.download.outputs.MINGW_URL == '' && steps.build64.outcome == 'failure'
         with:
           name: mingw-latest.zip
           path: ${{ github.workspace }}/mingw-latest.zip
@@ -263,10 +263,10 @@ jobs:
       - name: Get last release files
         id: checkurls
         run: |
-          url1=$(curl -s https://api.github.com/repos/helviojunior/shellcodetester/releases/latest | jq -r '.assets[] | select(.name|match("mingw-latest.zip$")) | .browser_download_url')
-          url2=$(curl -s https://api.github.com/repos/helviojunior/shellcodetester/releases/latest | jq -r '.assets[] | select(.name|match("binutils.zip$")) | .browser_download_url')
-          echo "::set-output name=MINGW_URL::${url1}"
-          echo "::set-output name=BINUTILS_URL::${url2}"
+          url1=$(curl -s https://api.github.com/repos/helviojunior/shellcodetester/releases | jq -r '[ .[] | {id: .id, tag_name: .tag_name, assets: [ .assets[] | select(.name|match("mingw-latest.zip$")) | {name: .name, browser_download_url: .browser_download_url} ]} | select(.assets != []) ] | sort_by(.id) | reverse | first(.[].assets[]) | .browser_download_url')
+          url2=$(curl -s https://api.github.com/repos/helviojunior/shellcodetester/releases | jq -r '[ .[] | {id: .id, tag_name: .tag_name, assets: [ .assets[] | select(.name|match("binutils.zip$")) | {name: .name, browser_download_url: .browser_download_url} ]} | select(.assets != []) ] | sort_by(.id) | reverse | first(.[].assets[]) | .browser_download_url')
+          echo "MINGW_URL=${url1}" >> $GITHUB_OUTPUT
+          echo "BINUTILS_URL=${url2}" >> $GITHUB_OUTPUT
 
       - name: Upload binutils release asset
         if:
