@@ -263,8 +263,8 @@ jobs:
       - name: Get last release files
         id: checkurls
         run: |
-          url1=$(curl -s https://api.github.com/repos/helviojunior/shellcodetester/releases | jq -r '[ .[] | {id: .id, tag_name: .tag_name, assets: [ .assets[] | select(.name|match("mingw-latest.zip$")) | {name: .name, browser_download_url: .browser_download_url} ]} | select(.assets != []) ] | sort_by(.id) | reverse | first(.[].assets[]) | .browser_download_url')
-          url2=$(curl -s https://api.github.com/repos/helviojunior/shellcodetester/releases | jq -r '[ .[] | {id: .id, tag_name: .tag_name, assets: [ .assets[] | select(.name|match("binutils.zip$")) | {name: .name, browser_download_url: .browser_download_url} ]} | select(.assets != []) ] | sort_by(.id) | reverse | first(.[].assets[]) | .browser_download_url')
+          url1=$(curl -s https://api.github.com/repos/helviojunior/shellcodetester/releases/latest | jq -r '.assets[] | select(.name|match("mingw-latest.zip$")) | .browser_download_url')
+          url2=$(curl -s https://api.github.com/repos/helviojunior/shellcodetester/releases/latest | jq -r '.assets[] | select(.name|match("binutils.zip$")) | .browser_download_url')
           echo "MINGW_URL=${url1}" >> $GITHUB_OUTPUT
           echo "BINUTILS_URL=${url2}" >> $GITHUB_OUTPUT
 
