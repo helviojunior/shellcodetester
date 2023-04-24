@@ -124,16 +124,16 @@ class Compiler(AsmFile):
                 f.write('int wtext(){\n')
                 if self.writable_text:
                     f.write('''
-    DWORD       page = 4096;
+    long        page = 4096;
     intptr_t    start_addr = (intptr_t)0x00;
     intptr_t    end_addr = (intptr_t)0x00;
 
     #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__) || defined(WIN64) || defined(_WIN64) || defined(__WIN64__)
         SYSTEM_INFO si;
         GetSystemInfo(&si);
-        page = (DWORD)si.dwPageSize;
+        page = (long)si.dwPageSize;
     #elif __linux__
-        page = (DWORD)sysconf(_SC_PAGESIZE);
+        page = (long)sysconf(_SC_PAGESIZE);
     #else
         return errno;
     #endif
@@ -180,6 +180,8 @@ class Compiler(AsmFile):
 
     // calculate page boundary
     size_t      length = (size_t)(end_addr - start_addr);
+    if (length <= 10)
+        length = page;
     length += (page - (length % page));
 
     //printf("start = %x\\n", start_addr);
@@ -190,7 +192,8 @@ class Compiler(AsmFile):
         DWORD l=0;
         VirtualProtect(start_addr, length, PAGE_EXECUTE_READWRITE, &l);
     #elif __linux__
-        if (mprotect(start_addr, length, PROT_READ | PROT_WRITE | PROT_EXEC))
+        void *start = (char *)start_addr;
+        if (mprotect(start, length, PROT_READ | PROT_WRITE | PROT_EXEC))
             return errno;
     #else
         return errno;
