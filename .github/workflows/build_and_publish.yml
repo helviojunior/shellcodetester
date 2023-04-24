@@ -62,7 +62,7 @@ jobs:
         if:
           steps.download.outputs.MINGW_URL != ''
         run: |
-          wget -O /tmp/mingw-latest.zip "${{ steps.download.outputs.MINGW_URL }}"
+          wget -nv -O /tmp/mingw-latest.zip "${{ steps.download.outputs.MINGW_URL }}"
 
       - name: Upload last released mingw
         uses: actions/upload-artifact@v2
@@ -168,7 +168,7 @@ jobs:
         run: |
           mkdir $GITHUB_WORKSPACE/build/
           cd $GITHUB_WORKSPACE/build/
-          wget http://ftp.gnu.org/gnu/binutils/binutils-$bin_version.tar.gz
+          wget -nv http://ftp.gnu.org/gnu/binutils/binutils-$bin_version.tar.gz
           tar xzf binutils-$bin_version.tar.gz
 
       - name: Build binutils
@@ -240,9 +240,9 @@ jobs:
 
       - name: Download nasm
         run: |
-          wget https://www.nasm.us/pub/nasm/releasebuilds/2.16.01/win64/nasm-2.16.01-win64.zip -O /tmp/nasm_win.zip
-          wget https://www.nasm.us/pub/nasm/releasebuilds/2.16.01/macosx/nasm-2.16.01-macosx.zip -O /tmp/nasm_mac.zip
-          wget https://www.nasm.us/pub/nasm/releasebuilds/2.16.01/linux/nasm-2.16.01-0.fc36.x86_64.rpm -O /tmp/nasm_linux.rpm
+          wget -nv https://www.nasm.us/pub/nasm/releasebuilds/2.16.01/win64/nasm-2.16.01-win64.zip -O /tmp/nasm_win.zip
+          wget -nv https://www.nasm.us/pub/nasm/releasebuilds/2.16.01/macosx/nasm-2.16.01-macosx.zip -O /tmp/nasm_mac.zip
+          wget -nv https://www.nasm.us/pub/nasm/releasebuilds/2.16.01/linux/nasm-2.16.01-0.fc36.x86_64.rpm -O /tmp/nasm_linux.rpm
           unzip -jo /tmp/nasm_win.zip -d /tmp/
           cp /tmp/nasm.exe shell_bins/windows/
           unzip -jo /tmp/nasm_mac.zip -d /tmp/

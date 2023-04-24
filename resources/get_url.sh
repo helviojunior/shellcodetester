@@ -13,7 +13,7 @@ if [ "W$url" = "W" ]; then
 fi
 
 rm -rf /tmp/mingw-latest.zip
-wget -O /tmp/mingw-latest.zip "$url"
+wget -nv -O /tmp/mingw-latest.zip "$url"
 if [ ! -f "/tmp/mingw-latest.zip" ]; then
     echo "Zip file not found"
     echo "MINGW_URL=" >> $GITHUB_OUTPUT

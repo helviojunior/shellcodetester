@@ -111,8 +111,8 @@ jobs:
 
       - name: Download last release
         run: |
-          wget -O /tmp/mingw-latest.zip "${{ steps.download.outputs.MINGW_URL }}"
-          wget -O /tmp/binutils.zip "${{ steps.download.outputs.BINUTILS_URL }}"
+          wget -nv -O /tmp/mingw-latest.zip "${{ steps.download.outputs.MINGW_URL }}"
+          wget -nv -O /tmp/binutils.zip "${{ steps.download.outputs.BINUTILS_URL }}"
 
       - name: Upload binutils
         uses: actions/upload-artifact@v2
