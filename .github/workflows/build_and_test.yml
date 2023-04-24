@@ -82,19 +82,15 @@ jobs:
 
     strategy:
       fail-fast: false
-      matrix:
-        python-version: ["3.9"]
-        experimental: [false]
-    continue-on-error: ${{ matrix.experimental }}
 
     steps:
       - name: Checkout ShellcodeTester
         uses: actions/checkout@v3
 
-      - name: Setup Python ${{ matrix.python-version }}
+      - name: Setup Python
         uses: actions/setup-python@v3
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: "3.9"
 
       - name: Install dependencies
         uses: awalsh128/cache-apt-pkgs-action@latest
@@ -144,7 +140,8 @@ jobs:
       - name: Get dist file
         id: distfile
         run: |
-          file=$(find `pwd`/dist/ -name "*.tar.gz" | head -n 1)
+          p=$(pwd)
+          file=$(find ${p}/dist/ -name "*.tar.gz" | head -n 1)
           [ "W$file" == "W" ] && exit 1
           [ ! -d "$file" ] && exit 1
           name=$(basename "$file")
