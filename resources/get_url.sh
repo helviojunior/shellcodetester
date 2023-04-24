@@ -12,7 +12,15 @@ if [ "W$url" = "W" ]; then
     exit 0
 fi
 
+echo "URL: $url"
+
+rm -rf /tmp/mingw-latest.zip
 wget -q -O /tmp/mingw-latest.zip "$url"
+if [ ! -f "/tmp/mingw-latest.zip" ]; then
+    echo "Zip file not found"
+    exit 0
+fi
+
 unzip -q -o /tmp/mingw-latest.zip -d /tmp/
 VERSION_FILE=$(find /tmp/ -name "VERSION.txt" -type f 2>/dev/null)
 
