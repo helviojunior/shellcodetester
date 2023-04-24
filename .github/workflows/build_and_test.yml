@@ -111,7 +111,7 @@ jobs:
 
       - name: Download last release
         run: |
-          wget -q -O /tmp/mingw-latest.zip "${{ steps.download.outputs.DOWNLOAD_URL }}"
+          [ ! -f "/tmp/mingw-latest.zip" ] && wget -q -O /tmp/mingw-latest.zip "${{ steps.download.outputs.DOWNLOAD_URL }}"
           wget -q -O /tmp/binutils.zip https://github.com/helviojunior/shellcodetester/releases/latest/download/binutils.zip
 
       - name: Upload binutils
