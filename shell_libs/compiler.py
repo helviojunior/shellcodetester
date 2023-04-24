@@ -64,7 +64,8 @@ class Compiler(AsmFile):
                 f.write('#include<string.h>\n')
                 f.write('#include<time.h>\n')
                 f.write('\n')
-                f.write('#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__) || defined(WIN64) || defined(_WIN64) || defined(__WIN64__)\n')
+                f.write(
+                    '#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__) || defined(WIN64) || defined(_WIN64) || defined(__WIN64__)\n')
                 f.write('    #include <windows.h>\n')
                 f.write('#elif __APPLE__\n')
                 f.write('    #include <TargetConditionals.h>\n')
@@ -111,7 +112,10 @@ class Compiler(AsmFile):
                     f.write('    printf("rsi = %p => writable memory (%zd bytes)\\n", &ZEROARRAY, size2);\n')
 
                 f.write('\n')
-                f.write('    wtext();\n')
+                f.write('    if (wtext()) {\n')
+                f.write('       printf("Error setting .text permission");\n')
+                f.write('       return 1;\n')
+                f.write('    }\n')
                 f.write('    shell(&code_cave, &ZEROARRAY);\n')
                 f.write('    return 0;\n')
                 f.write('}\n')
@@ -119,25 +123,81 @@ class Compiler(AsmFile):
 
                 f.write('int wtext(){\n')
                 if self.writable_text:
-                    f.write('    void       *const target = &main;\n')
-                    f.write('    size_t      length = (size_t)((intptr_t) end_of_code - (intptr_t)main);\n')
-                    f.write('    #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__) || defined(WIN64) || defined(_WIN64) || defined(__WIN64__)\n')
-                    f.write('        SYSTEM_INFO si;\n')
-                    f.write('        GetSystemInfo(&si);\n')
-                    f.write('        const long  page = si.dwPageSize;\n')
-                    f.write('        DWORD l=0;\n')
-                    f.write('        void       *start = (char *)target - ((long)target % page);\n')
-                    f.write('        size_t      bytes = length;\n')
-                    f.write('        VirtualProtect(start, bytes, PAGE_EXECUTE_READWRITE, &l);\n')
-                    f.write('    #elif __linux__\n')
-                    f.write('        const long  page = sysconf(_SC_PAGESIZE);\n')
-                    f.write('        void       *start = (char *)target - ((long)target % page);\n')
-                    f.write('        size_t      bytes = length;\n')
-                    f.write('        if (mprotect(start, page, PROT_READ | PROT_WRITE | PROT_EXEC))\n')
-                    f.write('            return errno;\n')
-                    f.write('    #else\n')
-                    f.write('        return errno;\n')
-                    f.write('    #endif\n')
+                    f.write('''
+    DWORD       page = 4096;
+    intptr_t    start_addr = (intptr_t)0x00;
+    intptr_t    end_addr = (intptr_t)0x00;
+
+    #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__) || defined(WIN64) || defined(_WIN64) || defined(__WIN64__)
+        SYSTEM_INFO si;
+        GetSystemInfo(&si);
+        page = (DWORD)si.dwPageSize;
+    #elif __linux__
+        page = (DWORD)sysconf(_SC_PAGESIZE);
+    #else
+        return errno;
+    #endif
+
+    // calculate max address    
+    // main
+    if ((intptr_t)main >= end_addr)
+        end_addr = (intptr_t)main;
+    // shell
+    if ((intptr_t)shell >= end_addr)
+        end_addr = (intptr_t)shell;
+    // code_cave
+    if ((intptr_t)code_cave >= end_addr)
+        end_addr = (intptr_t)code_cave;
+    // wtext
+    if ((intptr_t)wtext >= end_addr)
+        end_addr = (intptr_t)wtext;
+    // end_of_code
+    if ((intptr_t)end_of_code >= end_addr)
+        end_addr = (intptr_t)end_of_code;
+
+
+    // calculate min address
+    start_addr = end_addr;
+    // main
+    if ((intptr_t)main <= start_addr)
+        start_addr = (intptr_t)main;
+
+    // shell
+    if ((intptr_t)shell <= start_addr)
+        start_addr = (intptr_t)shell;
+
+    // code_cave
+    if ((intptr_t)code_cave <= start_addr)
+        start_addr = (intptr_t)code_cave;
+
+    // wtext
+    if ((intptr_t)wtext <= start_addr)
+        start_addr = (intptr_t)wtext;
+
+    // end_of_code
+    if ((intptr_t)end_of_code <= start_addr)
+        start_addr = (intptr_t)end_of_code;
+
+    // calculate page boundary
+    size_t      length = (size_t)(end_addr - start_addr);
+    length += (page - (length % page));
+
+    //printf("start = %x\\n", start_addr);
+    //printf("end_addr = %x\\n", end_addr);
+    //printf("len = %d\\n", length);
+
+    #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__) || defined(WIN64) || defined(_WIN64) || defined(__WIN64__)
+        DWORD l=0;
+        VirtualProtect(start_addr, length, PAGE_EXECUTE_READWRITE, &l);
+    #elif __linux__
+        if (mprotect(start_addr, length, PROT_READ | PROT_WRITE | PROT_EXEC))
+            return errno;
+    #else
+        return errno;
+    #endif
+
+    return 0;
+                    ''')
                 else:
                     f.write('        return 0;\n')
                 f.write('}\n')
@@ -207,7 +267,7 @@ class Compiler(AsmFile):
             self.bin_file.unlink(missing_ok=True)
 
         gcc_flags = '-fno-stack-protector'
-        #if not Tools.is_platform_windows():
+        # if not Tools.is_platform_windows():
         #    gcc_flags = ' -z execstack'
         if self.arch == 'x86':
             gcc_flags += ' -m32'
@@ -254,7 +314,8 @@ class Compiler(AsmFile):
         file = Path(filename)
         stat = self.bin_file.stat()
         if stat.st_size == 0:
-            Logger.pl('{!} {R}Error putting the shellcode at {G}%s{R}:{O} %s{W}' % (file.name, 'Executable file is empty'))
+            Logger.pl(
+                '{!} {R}Error putting the shellcode at {G}%s{R}:{O} %s{W}' % (file.name, 'Executable file is empty'))
             return False
 
         with open(file.resolve(), 'rb') as f:
@@ -262,12 +323,14 @@ class Compiler(AsmFile):
 
         idx = Tools.find_index(bin_data, pattern)
         if idx == -1:
-            Logger.pl('{!} {R}Error putting the shellcode at {G}%s{R}:{O} %s{W}' % (file.name, 'Find pattern not found'))
+            Logger.pl(
+                '{!} {R}Error putting the shellcode at {G}%s{R}:{O} %s{W}' % (file.name, 'Find pattern not found'))
             return False
 
         if idx + len(replace_to) > len(bin_data):
             Logger.pl(
-                '{!} {R}Error putting the shellcode at {G}%s{R}:{O} %s{W}' % (file.name, 'replace_to data is greater than binary file'))
+                '{!} {R}Error putting the shellcode at {G}%s{R}:{O} %s{W}' % (
+                file.name, 'replace_to data is greater than binary file'))
             return False
 
         fill_data = bytearray([
