@@ -22,6 +22,7 @@ if [ ! -f "/tmp/mingw-latest.zip" ]; then
 fi
 
 unzip -q -o /tmp/mingw-latest.zip -d /tmp/
+rm -rf /tmp/mingw-latest.zip
 VERSION_FILE=$(find /tmp/ -name "VERSION.txt" -type f 2>/dev/null)
 
 if [ "W$VERSION_FILE" = "W" ] || [ ! -f "$VERSION_FILE" ]; then
