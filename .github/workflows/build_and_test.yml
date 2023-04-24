@@ -39,9 +39,128 @@ jobs:
         run: |
           flake8 . --count --ignore=E1,E2,E3,E501,W291,W293 --exit-zero --max-complexity=65 --max-line-length=127 --statistics
 
-  test:
-    name: Run unit tests and build wheel
+  get_builds:
+    name: Get last released binaries
     needs: lint
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: wget curl jq
+          version: 1.0
+
+      - name: Get last release version
+        id: download
+        run: |
+          chmod +x ./resources/get_url.sh
+          ./resources/get_url.sh
+
+      - name: Download last release
+        run: |
+          wget -nv -O /tmp/mingw-latest.zip "${{ steps.download.outputs.MINGW_URL }}"
+          wget -nv -O /tmp/binutils.zip "${{ steps.download.outputs.BINUTILS_URL }}"
+
+      - name: Upload binutils
+        uses: actions/upload-artifact@v2
+        with:
+          name: binutils.zip
+          path: /tmp/binutils.zip
+          retention-days: 3
+
+  build_package:
+    name: Build local package
+    needs: get_builds
+    runs-on: ubuntu-latest
+    if:
+      github.event_name == 'push' || github.event.pull_request.head.repo.full_name !=
+      github.repository
+
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.9"]
+        experimental: [false]
+    continue-on-error: ${{ matrix.experimental }}
+
+    steps:
+      - name: Checkout ShellcodeTester
+        uses: actions/checkout@v3
+
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: rpm2cpio wget 7zip
+          version: 1.0
+
+      - name: Download arfactory
+        uses: actions/download-artifact@v3
+        id: download
+        with:
+          name: binutils.zip
+          path: /tmp/
+
+      - name: Copy binaries
+        run: |
+          mkdir shell_bins/linux/
+          mkdir shell_bins/windows/
+          mkdir shell_bins/macosx/
+          unzip -o ${{steps.download.outputs.download-path}}/binutils.zip -d ./shell_bins/
+          [ -d ./shell_bins/shell_bins ] && rsync -av ./shell_bins/shell_bins/* shell_bins/
+          echo "" > shell_bins/__init__.py
+          echo "" > shell_bins/linux/__init__.py
+          echo "" > shell_bins/windows/__init__.py
+          echo "" > shell_bins/macosx/__init__.py
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r tests/requirements-test.txt
+
+      - name: Change Package version
+        run: |
+          oldv=$( grep '__version__' shell_libs/__meta__.py | grep -oE '[0-9\.]+')
+          current=$(date '+%Y%m%d%H%M%S')
+          meta=$(cat shell_libs/__meta__.py | sed "s/__version__.*/__version__ = '"${oldv}"-"${current}"'/")
+          echo "$meta" > shell_libs/__meta__.py
+
+      - name: Install shellcodetester
+        run: |
+          pip install .
+
+      - name: Build artifact
+        run: |
+          python setup.py sdist
+
+      - name: Get dist file
+        id: distfile
+        run: |
+          file=$(find `pwd`/dist/ -name "*.tar.gz" | head -n 1)
+          [ "W$file" == "W" ] && exit 1
+          [ ! -d "$file" ] && exit 1
+          name=$(basename "$file")
+          echo "NAME=${name}" >> $GITHUB_OUTPUT
+          echo "DIST_FILE=${file}" >> $GITHUB_OUTPUT
+
+      - name: Upload dist file
+        uses: actions/upload-artifact@v2
+        with:
+          name: dist.tar.gz
+          path: ${{ steps.distfile.outputs.DIST_FILE }}
+          retention-days: 3
+
+  test:
+    name: Run unit tests
+    needs: build_package
     runs-on: ${{ matrix.os }}
     if:
       github.event_name == 'push' || github.event.pull_request.head.repo.full_name !=
@@ -76,54 +195,24 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -r tests/requirements-test.txt
 
+      - name: Download arfactory
+        uses: actions/download-artifact@v3
+        id: download
+        with:
+          name: dist.tar.gz
+          path: /tmp/
+
       - name: Install shellcodetester
         run: |
-          pip install .
+          pip install /tmp/dist.tar.gz
 
       - name: Run unit tests
         run: |
           pytest -s tests/tests.py
 
-      - name: Build artifact
-        run: |
-          python setup.py sdist
-
-  get_builds:
-    name: Get last released binaries
-    needs: lint
-    runs-on: ubuntu-latest
-    steps:
-
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      - name: Install dependencies
-        uses: awalsh128/cache-apt-pkgs-action@latest
-        with:
-          packages: wget curl jq
-          version: 1.0
-
-      - name: Get last release version
-        id: download
-        run: |
-          chmod +x ./resources/get_url.sh
-          ./resources/get_url.sh
-
-      - name: Download last release
-        run: |
-          wget -nv -O /tmp/mingw-latest.zip "${{ steps.download.outputs.MINGW_URL }}"
-          wget -nv -O /tmp/binutils.zip "${{ steps.download.outputs.BINUTILS_URL }}"
-
-      - name: Upload binutils
-        uses: actions/upload-artifact@v2
-        with:
-          name: binutils.zip
-          path: /tmp/binutils.zip
-          retention-days: 3
-
   publish:
     name: Publish on Test Environment
-    needs: [test, get_builds]
+    needs: asm_test
     runs-on: ubuntu-latest
     if:
       github.event_name == 'push' || github.event.pull_request.head.repo.full_name !=
