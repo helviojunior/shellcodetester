@@ -161,39 +161,37 @@ class Compiler(AsmFile):
     // main
     if ((intptr_t)main <= start_addr)
         start_addr = (intptr_t)main;
-
     // shell
     if ((intptr_t)shell <= start_addr)
         start_addr = (intptr_t)shell;
-
     // code_cave
     if ((intptr_t)code_cave <= start_addr)
         start_addr = (intptr_t)code_cave;
-
     // wtext
     if ((intptr_t)wtext <= start_addr)
         start_addr = (intptr_t)wtext;
-
     // end_of_code
     if ((intptr_t)end_of_code <= start_addr)
         start_addr = (intptr_t)end_of_code;
 
-    // calculate page boundary
+    // calculate lenght
     size_t      length = (size_t)(end_addr - start_addr);
     if (length <= 10)
         length = page;
     length += (page - (length % page));
 
-    //printf("start = %x\\n", start_addr);
+    // Calculate page boundary
+    void *start = (char *)start_addr - ((long)start_addr % page);
+
+    //printf("start = %x\\n", start);
     //printf("end_addr = %x\\n", end_addr);
     //printf("len = %d\\n", length);
 
     #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__) || defined(WIN64) || defined(_WIN64) || defined(__WIN64__)
         DWORD l=0;
-        VirtualProtect(start_addr, length, PAGE_EXECUTE_READWRITE, &l);
+        VirtualProtect(start, length, PAGE_EXECUTE_READWRITE, &l);
     #elif __linux__
-        void *start = (char *)start_addr;
-        if (mprotect(start, length, PROT_READ | PROT_WRITE | PROT_EXEC))
+        if (mprotect(start, length, PROT_READ | PROT_WRITE | PROT_EXEC) == -1)
             return errno;
     #else
         return errno;
