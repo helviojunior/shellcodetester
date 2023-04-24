@@ -4,7 +4,7 @@ C_BINUTILS_VERSION=2.39
 C_GCC_VERSION=12.2.0
 C_MINGW_VERSION=10.0.0
 
-url=$(curl -s https://api.github.com/repos/helviojunior/shellcodetester/releases | jq -r '[ .[] | {id: .id, tag_name: .tag_name, assets: [ .assets[] | select(.name|match("mingw-latest.zip$")) | {name: .name, browser_download_url: .browser_download_url} ]} | select(.assets != []) ] | sort_by(.id) | reverse | .[].assets[].browser_download_url')
+url=$(curl -s https://api.github.com/repos/helviojunior/shellcodetester/releases | jq -r '[ .[] | {id: .id, tag_name: .tag_name, assets: [ .assets[] | select(.name|match("mingw-latest.zip$")) | {name: .name, browser_download_url: .browser_download_url} ]} | select(.assets != []) ] | sort_by(.id) | reverse | first(.[].assets[]) | .browser_download_url')
 
 if [ "W$url" = "W" ]; then
     echo "Release url not found"
@@ -15,7 +15,7 @@ fi
 echo "URL: $url"
 
 rm -rf /tmp/mingw-latest.zip
-curl -Lo /tmp/mingw-latest.zip "$url"
+wget -q -O /tmp/mingw-latest.zip "$url"
 if [ ! -f "/tmp/mingw-latest.zip" ]; then
     echo "Zip file not found"
     exit 0
