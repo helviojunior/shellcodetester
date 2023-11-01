@@ -21,6 +21,7 @@ RUBY = 20
 SH = 21
 VBAPPLICATION = 22
 VBSCRIPT = 23
+VSASM = 24
 
 _formatToName = {
     BASE32: 'BASE32',
@@ -42,6 +43,7 @@ _formatToName = {
     SH: 'SH',
     VBAPPLICATION: 'VBAPPLICATION',
     VBSCRIPT: 'VBSCRIPT',
+    VSASM: 'VSASM',
 }
 _nameToFormat = {
     'BASE32': BASE32,
@@ -63,6 +65,7 @@ _nameToFormat = {
     'SH': SH,
     'VBAPPLICATION': VBAPPLICATION,
     'VBSCRIPT': VBSCRIPT,
+    'VSASM': VSASM
 }
 _formatParameters = {
     BASE32: ('', '', '', '', '', '{content}'),
@@ -84,6 +87,7 @@ _formatParameters = {
     RUBY: ('', '\\x', '"', '" +', '+', '{var_name} = \n{content};'),
     VBAPPLICATION: ('&', '', '', '', '', '{var_name}={content}'),
     VBSCRIPT: ('&', '', '', '', '', '{var_name}={content}'),
+    VSASM: ('h, ', '0', '    payload{line} db ', '', ',', 'ShellcodeTester PROC\n    {content}h\nShellcodeTester ENDP\n'),
 }
 
 
@@ -136,12 +140,19 @@ class Transform(object):
                 return data
         else:
             if self._line_size > 1:
-                return f'{separator}{el}\n'.join(
+                return f'\n'.join(
                     [
-                        (
-                                self._line_prefix + sl + separator.join(self._format_byte(x, marker, bad_chars)
-                                                                   for x in data[i:i + self._line_size])
-                        ) for i in range(0, len(data), self._line_size)
+                        line.rstrip().strip(t)
+                        for line in
+                        f'{separator}{el}\n'.join(
+                            [
+                                (
+                                        self._line_prefix + sl + separator.join(self._format_byte(x, marker, bad_chars)
+                                                                           for x in data[i:i + self._line_size])
+                                ).replace('{line}', str(i)).rstrip().strip(t)
+                                for i in range(0, len(data), self._line_size)
+                            ]
+                        ).split('\n')
                     ]
                 ) + el
 
