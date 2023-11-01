@@ -203,7 +203,7 @@ jobs:
       - name: Install ShellcodeTester
         run: |
           p=${{steps.download.outputs.download-path}}
-          file=$(find ${p}/dist/ -name "*.tar.gz" | head -n 1)
+          file=$(find ${p} -name "*.tar.gz" | head -n 1)
           echo "File: ${file}"
           [ "W$file" == "W" ] && exit 1
           [ ! -f "$file" ] && exit 2
