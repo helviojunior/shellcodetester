@@ -5,7 +5,7 @@ name: Test Build
 
 on:
     push:
-      branches: [ none ] #change to main
+      branches: [ master ] #change to main
       paths-ignore:
         - .gitignore
         - README.md
@@ -16,7 +16,7 @@ on:
         - '**.md'
 
     pull_request:
-      branches: [ none ]
+      branches: [ master ]
       paths-ignore:
         - .gitignore
         - README.md
