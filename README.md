@@ -2,7 +2,7 @@
 
 [![Build](https://github.com/helviojunior/shellcodetester/actions/workflows/build_and_publish.yml/badge.svg)](https://github.com/helviojunior/shellcodetester/actions/workflows/build_and_publish.yml)
 [![Build](https://github.com/helviojunior/shellcodetester/actions/workflows/build_and_test.yml/badge.svg)](https://github.com/helviojunior/shellcodetester/actions/workflows/build_and_test.yml)
-[![Downloads](https://pepy.tech/badge/shellcodetester/month)](https://pepy.tech/project/shellcodetester)
+[![Downloads](https://pepy.tech/badge/shellcodetester)](https://pepy.tech/project/shellcodetester)
 [![Supported Versions](https://img.shields.io/pypi/pyversions/shellcodetester.svg)](https://pypi.org/project/shellcodetester)
 [![Contributors](https://img.shields.io/github/contributors/helviojunior/shellcodetester.svg)](https://github.com/helviojunior/shellcodetester/graphs/contributors)
 [![PyPI version](https://img.shields.io/pypi/v/shellcodetester.svg)](https://pypi.org/project/shellcodetester/)
