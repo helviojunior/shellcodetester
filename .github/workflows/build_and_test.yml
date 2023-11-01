@@ -198,10 +198,12 @@ jobs:
         id: download
         with:
           name: dist.tar.gz
-          path: /tmp/
+          path: .
 
       - name: Install shellcodetester
         run: |
+          ls -lah ${{steps.download.outputs.download-path}}
+
           pip install ${{steps.download.outputs.download-path}}/dist.tar.gz
 
       - name: Run unit tests
