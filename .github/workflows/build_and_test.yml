@@ -152,7 +152,7 @@ jobs:
       - name: Upload dist file
         uses: actions/upload-artifact@v2
         with:
-          name: dist.tar.gz
+          name: ShellcodeTester-latest
           path: ${{ steps.distfile.outputs.DIST_FILE }}
           retention-days: 3
 
@@ -197,14 +197,17 @@ jobs:
         uses: actions/download-artifact@v3
         id: download
         with:
-          name: dist.tar.gz
-          path: .
+          name: ShellcodeTester-latest
+          path: /tmp/
 
-      - name: Install shellcodetester
+      - name: Install ShellcodeTester
         run: |
-          ls -lah ${{steps.download.outputs.download-path}}
-
-          pip install ${{steps.download.outputs.download-path}}/dist.tar.gz
+          p=${{steps.download.outputs.download-path}}
+          file=$(find ${p}/dist/ -name "*.tar.gz" | head -n 1)
+          echo "File: ${file}"
+          [ "W$file" == "W" ] && exit 1
+          [ ! -f "$file" ] && exit 2
+          pip install ${file}
 
       - name: Run unit tests
         run: |
