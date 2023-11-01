@@ -12,7 +12,7 @@ on:
         - LICENSE
         - TODO
         - shell_bins/__meta__.py
-        #- .github/workflows/build_and_test.yml
+        - .github/workflows/build_and_test.yml
         - '**.md'
 
     pull_request:
