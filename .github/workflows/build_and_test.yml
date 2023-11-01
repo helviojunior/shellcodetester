@@ -202,7 +202,7 @@ jobs:
 
       - name: Install shellcodetester
         run: |
-          pip install /tmp/dist.tar.gz
+          pip install ${{steps.download.outputs.download-path}}/dist.tar.gz
 
       - name: Run unit tests
         run: |
