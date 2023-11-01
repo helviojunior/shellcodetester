@@ -5,9 +5,26 @@ name: Test Build
 
 on:
     push:
-      branches: [ master ]
+      branches: [ none ] #change to main
+      paths-ignore:
+        - .gitignore
+        - README.md
+        - LICENSE
+        - TODO
+        - shell_bins/__meta__.py
+        #- .github/workflows/build_and_test.yml
+        - '**.md'
+
     pull_request:
-      branches: [ master ]
+      branches: [ none ]
+      paths-ignore:
+        - .gitignore
+        - README.md
+        - LICENSE
+        - TODO
+        - shell_bins/__meta__.py
+        - .github/workflows/build_and_test.yml
+        - '**.md'
 
 jobs:
   lint:
@@ -145,6 +162,12 @@ jobs:
           echo "File: ${file}"
           [ "W$file" == "W" ] && exit 1
           [ ! -f "$file" ] && exit 2
+          echo "Moving ${file} to ${p}/dist/shellcodetester-latest.tar.gz"
+          mv "${file}" "${p}/dist/shellcodetester-latest.tar.gz"
+          file=$(find ${p}/dist/ -name "*.tar.gz" | head -n 1)
+          echo "New File: ${file}"
+          [ "W$file" == "W" ] && exit 1
+          [ ! -f "$file" ] && exit 2
           name=$(basename "$file")
           echo "NAME=${name}" >> $GITHUB_OUTPUT
           echo "DIST_FILE=${file}" >> $GITHUB_OUTPUT
@@ -198,16 +221,11 @@ jobs:
         id: download
         with:
           name: ShellcodeTester-latest
-          path: /tmp/
+          path: .
 
       - name: Install ShellcodeTester
         run: |
-          p=${{steps.download.outputs.download-path}}
-          file=$(find ${p} -name "*.tar.gz" | head -n 1)
-          echo "File: ${file}"
-          [ "W$file" == "W" ] && exit 1
-          [ ! -f "$file" ] && exit 2
-          pip install ${file}
+          pip install shellcodetester-latest.tar.gz
 
       - name: Run unit tests
         run: |
