@@ -205,14 +205,14 @@ jobs:
           version: 1.0
 
       - name: Download arfactory (linux)
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4.1.7
         id: download
         with:
           name: objdump_linux
           path: /tmp/
 
       - name: Download arfactory (MacOS)
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4.1.7
         id: download2
         with:
           name: objdump_macosx
@@ -227,7 +227,7 @@ jobs:
           cp ${{steps.download2.outputs.download-path}}/objdump_macosx* shell_bins/macosx/objdump
 
       - name: Download arfactory (windows)
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4.1.7
         id: mingwbuild
         with:
           name: mingw-latest.zip
@@ -319,7 +319,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Download arfactory
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4.1.7
         id: download
         with:
           name: binutils.zip

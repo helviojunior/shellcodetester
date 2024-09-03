@@ -116,7 +116,7 @@ jobs:
           version: 1.0
 
       - name: Download arfactory
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4.1.7
         id: download
         with:
           name: binutils.zip
@@ -217,7 +217,7 @@ jobs:
           python -m pip install -r tests/requirements-test.txt
 
       - name: Download arfactory
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4.1.7
         id: download
         with:
           name: ShellcodeTester-latest
@@ -262,7 +262,7 @@ jobs:
           version: 1.0
 
       - name: Download arfactory
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4.1.7
         id: download
         with:
           name: binutils.zip
