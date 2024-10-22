@@ -65,7 +65,7 @@ jobs:
           wget -nv -O /tmp/mingw-latest.zip "${{ steps.download.outputs.MINGW_URL }}"
 
       - name: Upload last released mingw
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         if:
           steps.download.outputs.MINGW_URL != ''
         with:
@@ -86,7 +86,7 @@ jobs:
         continue-on-error: true
 
       - name: Upload new mingw
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         if:
           steps.download.outputs.MINGW_URL == '' && steps.build64.outcome == 'success'
         with:
@@ -101,7 +101,7 @@ jobs:
         run: chmod +x ./resources/build.sh && sudo ./resources/build.sh
 
       - name: Upload new mingw
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         if:
           steps.download.outputs.MINGW_URL == '' && steps.build64.outcome == 'failure'
         with:
@@ -131,7 +131,7 @@ jobs:
           cp $(which objdump) ${{ github.workspace }}/objdump_macosx
 
       - name: Upload objdump for macosx
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: objdump_macosx
           path: ${{ github.workspace }}/objdump_macosx
@@ -180,7 +180,7 @@ jobs:
           cp ./binutils/objdump ${{ github.workspace }}/objdump_linux
 
       - name: Upload objdump for linux
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: objdump_linux
           path: ${{ github.workspace }}/objdump_linux
@@ -205,14 +205,14 @@ jobs:
           version: 1.0
 
       - name: Download arfactory (linux)
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         id: download
         with:
           name: objdump_linux
           path: /tmp/
 
       - name: Download arfactory (MacOS)
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         id: download2
         with:
           name: objdump_macosx
@@ -227,7 +227,7 @@ jobs:
           cp ${{steps.download2.outputs.download-path}}/objdump_macosx* shell_bins/macosx/objdump
 
       - name: Download arfactory (windows)
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         id: mingwbuild
         with:
           name: mingw-latest.zip
@@ -254,7 +254,7 @@ jobs:
           popd
 
       - name: Upload binutils
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: binutils.zip
           path: /tmp/binutils.zip
@@ -319,7 +319,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Download arfactory
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         id: download
         with:
           name: binutils.zip

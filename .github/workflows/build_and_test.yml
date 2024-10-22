@@ -83,7 +83,7 @@ jobs:
           wget -nv -O /tmp/binutils.zip "${{ steps.download.outputs.BINUTILS_URL }}"
 
       - name: Upload binutils
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: binutils.zip
           path: /tmp/binutils.zip
@@ -116,7 +116,7 @@ jobs:
           version: 1.0
 
       - name: Download arfactory
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         id: download
         with:
           name: binutils.zip
@@ -173,7 +173,7 @@ jobs:
           echo "DIST_FILE=${file}" >> $GITHUB_OUTPUT
 
       - name: Upload dist file
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: ShellcodeTester-latest
           path: ${{ steps.distfile.outputs.DIST_FILE }}
@@ -217,7 +217,7 @@ jobs:
           python -m pip install -r tests/requirements-test.txt
 
       - name: Download arfactory
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         id: download
         with:
           name: ShellcodeTester-latest
@@ -262,7 +262,7 @@ jobs:
           version: 1.0
 
       - name: Download arfactory
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         id: download
         with:
           name: binutils.zip
