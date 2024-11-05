@@ -4,20 +4,22 @@ import codecs
 import pytest, sys
 
 from shell_libs.color import Color
-from shellcodetester import shellcodetester
+from shellcodetester.shellcodetester import ShellcodeTester
 
 
 def test_step_001():
     Color.pl('\n\n{+} Compiling x86...{W}')
 
-    sys.argv = ['shellcodetester', 'asm', 'test_x86.asm']
+    sys.argv = ['shellcodetester', '-asm', 'test_x86.asm']
     if sys.stdout.encoding is None:
         # Output is redirected to a file
         sys.stdout = codecs.getwriter('latin-1')(sys.stdout)
 
     try:
 
-        shellcodetester.run()
+        o = ShellcodeTester()
+        o.print_banner()
+        o.main()
 
         assert True
     except Exception as e:
@@ -38,14 +40,16 @@ def test_step_001():
 def test_step_002():
     Color.pl('\n\n{+} Compiling x86_64...{W}')
 
-    sys.argv = ['shellcodetester', 'asm', 'test_x86_64.asm']
+    sys.argv = ['shellcodetester', '-asm', 'test_x86_64.asm']
     if sys.stdout.encoding is None:
         # Output is redirected to a file
         sys.stdout = codecs.getwriter('latin-1')(sys.stdout)
 
     try:
 
-        shellcodetester.run()
+        o = ShellcodeTester()
+        o.print_banner()
+        o.main()
 
         assert True
     except Exception as e:
