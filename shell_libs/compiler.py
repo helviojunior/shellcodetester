@@ -93,7 +93,7 @@ class Compiler(AsmFile):
                 f.write('\n')
                 f.write('char ZEROARRAY[1024] = {0};\n')
                 f.write('\n')
-                f.write('void shell(int*, int*);\n')
+                f.write('void shell(void*, void*);\n')
                 f.write('void code_cave();\n')
                 f.write('int wtext();\n')
                 f.write('int end_of_code();\n')
@@ -204,7 +204,7 @@ class Compiler(AsmFile):
                 f.write('}\n')
                 f.write('\n')
 
-                f.write('void shell(int *code_cave, int *data) {\n')
+                f.write('void shell(void *code_cave, void *data) {\n')
 
                 if self.arch == 'x86':
                     f.write('    asm("mov 0x8(%esp),%edi");\n')
