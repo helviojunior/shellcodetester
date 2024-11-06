@@ -234,7 +234,7 @@ jobs:
         with:
           name: binutils.zip
           path: /tmp/
-        if: matrix.os == 'ubuntu-latest' or matrix.os == 'macos-latest'
+        if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
 
       - name: Copy binaries
         run: |
@@ -247,17 +247,17 @@ jobs:
           echo "" > shell_bins/linux/__init__.py
           echo "" > shell_bins/windows/__init__.py
           echo "" > shell_bins/macosx/__init__.py
-        if: matrix.os == 'ubuntu-latest' or matrix.os == 'macos-latest'
+        if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
 
       - name: Run build test (x86)
         run: |
           shellcodetester -asm tests/test_x86.asm
-        if: matrix.os == 'ubuntu-latest' or matrix.os == 'macos-latest'
+        if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
 
       - name: Run build test (x86_64)
         run: |
           shellcodetester -asm tests/test_x86_64.asm
-        if: matrix.os == 'ubuntu-latest' or matrix.os == 'macos-latest'
+        if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
 
   publish:
     name: Publish on Test Environment
