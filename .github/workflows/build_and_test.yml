@@ -236,12 +236,6 @@ jobs:
           path: /tmp/
         if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
 
-      - name: Install CGG Multilib
-        run: |
-          apt update
-          apt-get install -yqq --no-install-recommends gcc-multilib
-        if: matrix.os == 'ubuntu-latest'
-
       - name: Copy binaries
         run: |
           mkdir shell_bins/linux/
@@ -254,6 +248,12 @@ jobs:
           echo "" > shell_bins/windows/__init__.py
           echo "" > shell_bins/macosx/__init__.py
         if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
+
+      - name: Install CGG Multilib
+        run: |
+          sudo apt update
+          sudo apt-get install -yqq --no-install-recommends gcc-multilib
+        if: matrix.os == 'ubuntu-latest'
 
       - name: Run build test (x86)
         run: |
