@@ -64,7 +64,7 @@ setup(
     package_data=package_data,
     data_files=[('', ['requirements.txt'])],
     include_package_data=False,
-    python_requires=">=3.7, <4",
+    python_requires=">=3.9, <4",
     install_requires=requires,
     license=meta["__license__"],
     readme="README.md",
