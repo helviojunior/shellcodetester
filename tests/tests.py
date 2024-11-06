@@ -4,7 +4,7 @@ import codecs
 import pytest, sys
 
 from shell_libs.color import Color
-from shellcodetester.shellcodetester import ShellcodeTester
+from ..shellcodetester import shellcodetester
 
 
 def test_step_001():
@@ -17,9 +17,7 @@ def test_step_001():
 
     try:
 
-        o = ShellcodeTester()
-        o.print_banner()
-        o.main()
+        shellcodetester.run()
 
         assert True
     except Exception as e:
@@ -47,9 +45,7 @@ def test_step_002():
 
     try:
 
-        o = ShellcodeTester()
-        o.print_banner()
-        o.main()
+        shellcodetester.run()
 
         assert True
     except Exception as e:
