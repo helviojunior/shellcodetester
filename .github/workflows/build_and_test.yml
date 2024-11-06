@@ -231,6 +231,14 @@ jobs:
         run: |
           pytest -s tests/tests.py
 
+      - name: Run build test (x86)
+        run: |
+          shellcodetester -asm tests/test_x86.asm
+
+      - name: Run build test (x86_64)
+        run: |
+          shellcodetester -asm tests/test_x86_64.asm
+
   publish:
     name: Publish on Test Environment
     needs: test
