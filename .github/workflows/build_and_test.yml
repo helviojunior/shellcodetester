@@ -236,6 +236,12 @@ jobs:
           path: /tmp/
         if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
 
+      - name: Install CGG Multilib
+        run: |
+          apt update
+          apt-get install -yqq --no-install-recommends gcc-multilib
+        if: matrix.os == 'ubuntu-latest'
+
       - name: Copy binaries
         run: |
           mkdir shell_bins/linux/
@@ -252,12 +258,12 @@ jobs:
       - name: Run build test (x86)
         run: |
           shellcodetester -asm tests/test_x86.asm
-        if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
+        if: matrix.os == 'ubuntu-latest'
 
       - name: Run build test (x86_64)
         run: |
           shellcodetester -asm tests/test_x86_64.asm
-        if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
+        if: matrix.os == 'ubuntu-latest'
 
   publish:
     name: Publish on Test Environment
