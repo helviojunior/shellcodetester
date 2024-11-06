@@ -12,7 +12,7 @@ on:
         - LICENSE
         - TODO
         - shell_bins/__meta__.py
-        - .github/workflows/build_and_test.yml
+        #- .github/workflows/build_and_test.yml
         - '**.md'
 
     pull_request:
@@ -231,13 +231,37 @@ jobs:
         run: |
           pytest -s tests/tests.py
 
+
+      - name: Download arfactory
+        uses: actions/download-artifact@v4
+        id: download
+        with:
+          name: binutils.zip
+          path: /tmp/
+        when: matrix.os == "ubuntu-latest" or matrix.os == "macos-latest"
+
+      - name: Copy binaries
+        run: |
+          mkdir shell_bins/linux/
+          mkdir shell_bins/windows/
+          mkdir shell_bins/macosx/
+          unzip -o ${{steps.download.outputs.download-path}}/binutils.zip -d ./shell_bins/
+          [ -d ./shell_bins/shell_bins ] && rsync -av ./shell_bins/shell_bins/* shell_bins/
+          echo "" > shell_bins/__init__.py
+          echo "" > shell_bins/linux/__init__.py
+          echo "" > shell_bins/windows/__init__.py
+          echo "" > shell_bins/macosx/__init__.py
+        when: matrix.os == "ubuntu-latest" or matrix.os == "macos-latest"
+
       - name: Run build test (x86)
         run: |
           shellcodetester -asm tests/test_x86.asm
+        when: matrix.os == "ubuntu-latest" or matrix.os == "macos-latest"
 
       - name: Run build test (x86_64)
         run: |
           shellcodetester -asm tests/test_x86_64.asm
+        when: matrix.os == "ubuntu-latest" or matrix.os == "macos-latest"
 
   publish:
     name: Publish on Test Environment
