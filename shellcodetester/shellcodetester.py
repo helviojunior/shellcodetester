@@ -89,6 +89,7 @@ class ShellcodeTester(Runner):
         """ Displays ASCII art of the highest caliber.  """
         Color.pl(Configuration.get_banner())
 
+
 def run():
     # Explicitly changing the stdout encoding format
     if sys.stdout.encoding is None:
@@ -101,6 +102,7 @@ def run():
     try:
         o.main()
 
+        Tools.exit_gracefully(0)
     except Exception as e:
         Color.pl('\n{!} {R}Error:{O} %s{W}' % str(e))
 
@@ -115,8 +117,7 @@ def run():
             Color.pl(err)
 
         Color.pl('\n{!} {R}Exiting{W}\n')
-
+        Tools.exit_gracefully(1)
     except KeyboardInterrupt:
         Color.pl('\n{!} {O}interrupted, shutting down...{W}')
-
-    Tools.exit_gracefully(2)
+        Tools.exit_gracefully(2)
